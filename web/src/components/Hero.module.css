@@ -1,0 +1,50 @@
+.hero {
+  position: relative;
+  isolation: isolate;
+  background-image: url('/img/hero-tapes.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    100deg,
+    rgba(120, 4, 8, 0.94) 0%,
+    rgba(180, 10, 14, 0.82) 45%,
+    rgba(20, 6, 8, 0.6) 100%
+  );
+}
+
+.inner {
+  padding-block: clamp(3rem, 9vw, 6.5rem);
+}
+
+.year {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  text-transform: none;
+  font-weight: 600;
+}
+
+.lead {
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 56ch;
+}
+
+.search {
+  max-width: 480px;
+}
+
+.jump {
+  align-self: flex-start;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.jump:hover {
+  background: rgba(255, 255, 255, 0.12);
+}

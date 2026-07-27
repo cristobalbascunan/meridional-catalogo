@@ -1,0 +1,28 @@
+.footer {
+  margin-top: 4rem;
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8));
+  border-top: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.logo {
+  height: 36px;
+  width: auto;
+  align-self: flex-start;
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: var(--mantine-radius-sm);
+  box-sizing: content-box;
+}
+
+.ce {
+  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.link {
+  cursor: pointer;
+  text-align: start;
+}
+
+.link:hover {
+  color: var(--mantine-color-brand-6);
+}

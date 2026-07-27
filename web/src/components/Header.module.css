@@ -1,0 +1,101 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: light-dark(rgba(255, 255, 255, 0.88), rgba(26, 27, 30, 0.88));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.top {
+  padding-block: 10px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+/* El logotipo tiene fondo blanco opaco: se le da forma de pastilla para que
+   sobre fondo oscuro parezca intencionado y no un recorte. */
+.logo {
+  height: 34px;
+  width: auto;
+  display: block;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: var(--mantine-radius-sm);
+  box-sizing: content-box;
+}
+
+@media (max-width: 36em) {
+  .logo {
+    height: 24px;
+    padding: 4px 6px;
+  }
+}
+
+.search {
+  flex: 1;
+  max-width: 520px;
+}
+
+/* En pantallas pequeñas la búsqueda se despliega bajo un botón para ahorrar espacio. */
+.searchToggle {
+  display: none;
+}
+
+.searchRow {
+  display: none;
+  padding-top: 8px;
+}
+
+@media (max-width: 62em) {
+  .search {
+    display: none;
+  }
+  .searchToggle {
+    display: inline-flex;
+  }
+  .searchRow[data-open] {
+    display: block;
+  }
+}
+
+.quoteFull {
+  display: inline-flex;
+}
+
+.quoteIcon {
+  display: none;
+}
+
+@media (max-width: 36em) {
+  .quoteFull {
+    display: none;
+  }
+  .quoteIcon {
+    display: inline-flex;
+  }
+}
+
+.navWrap {
+  border-top: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+}
+
+.chips {
+  padding: 8px max(16px, calc((100vw - 88rem) / 2 + 16px));
+}
+
+.chip {
+  /* Sin esto los chips se encogen con puntos suspensivos en lugar de desplazarse. */
+  flex: 0 0 auto;
+  max-width: none;
+  cursor: pointer;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  padding-inline: 14px;
+  height: 32px;
+}
