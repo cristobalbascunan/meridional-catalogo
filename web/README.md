@@ -54,6 +54,29 @@ servicio `dev`, en cambio, refleja los cambios al momento.
   WhatsApp ya redactado. La selección se guarda en el navegador.
 - **Modo claro y oscuro.**
 
+## Animaciones
+
+Todo el movimiento es nativo del navegador: no hay ninguna librería de animación
+instalada, así que no añade nada al tamaño del bundle y se ejecuta en el compositor.
+
+- **Entrada de las tarjetas** con animaciones ligadas al scroll
+  (`animation-timeline: view()`), sin JavaScript ni `IntersectionObserver`. Va dentro de
+  un `@supports`, así que en navegadores que no lo soporten la tarjeta aparece ya visible.
+- **Cambio de categoría o de filtro** con la View Transitions API. Sólo se funde la zona
+  de resultados, que lleva `view-transition-name: catalogo`; la cabecera y el hero no se
+  mueven. Como React pinta de forma asíncrona, el cambio de estado va dentro de un
+  `flushSync` (ver [`src/hooks/useViewTransition.ts`](src/hooks/useViewTransition.ts)).
+  Donde no exista la API, el filtro se aplica sin animar.
+- **Las fotos** hacen un fundido al terminar de descargarse, no al montarse, para que las
+  imágenes con carga diferida no parpadeen.
+- **`prefers-reduced-motion`**: todo lo que anima está dentro de
+  `@media (prefers-reduced-motion: no-preference)`. Con la opción del sistema activada la
+  web queda completamente estática, y las tarjetas se ven al 100 % de opacidad.
+
+Al tocar las animaciones de las tarjetas, anima la propiedad `translate` y no `transform`:
+`transform` está reservado para el desplazamiento del hover y, al ser propiedades
+independientes, ambas se componen sin pisarse.
+
 ## Estructura
 
 ```

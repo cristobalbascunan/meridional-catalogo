@@ -1,0 +1,28 @@
+/* Zona que se funde al cambiar de categoría o de filtro. */
+.results {
+  view-transition-name: catalogo;
+}
+
+/* En móvil los filtros se desplazan en horizontal en vez de ocupar tres líneas. */
+.filterRow {
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  scroll-snap-type: x proximity;
+}
+
+.filterRow::-webkit-scrollbar {
+  display: none;
+}
+
+.filterRow > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 48em) {
+  .filterRow {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}

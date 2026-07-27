@@ -39,6 +39,11 @@ export function ProductCard({ product, selected, showCategory, onOpen, onToggle 
           h={170}
           loading="lazy"
           className={classes.image}
+          onLoad={(e) => e.currentTarget.setAttribute('data-loaded', '')}
+          // Si la imagen ya estaba en caché, `onLoad` puede no llegar a dispararse.
+          ref={(el) => {
+            if (el?.complete) el.setAttribute('data-loaded', '');
+          }}
         />
         <Tooltip
           label={selected ? 'Quitar de la solicitud' : 'Añadir a la solicitud'}

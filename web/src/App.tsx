@@ -16,6 +16,7 @@ import {
 } from '@mantine/core';
 import { useWindowScroll } from '@mantine/hooks';
 import { IconArrowUp, IconFilterOff, IconMoodEmpty } from '@tabler/icons-react';
+import { useViewTransition } from './hooks/useViewTransition';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Footer } from './components/Footer';
@@ -31,6 +32,7 @@ import {
   type Product,
   type Tag,
 } from './data/catalog';
+import classes from './App.module.css';
 
 /** Normaliza para buscar sin distinguir mayúsculas ni acentos. */
 const norm = (s: string) =>
@@ -54,28 +56,49 @@ export default function App() {
   const [scroll, scrollTo] = useWindowScroll();
 
   const quote = useQuote();
+  const startTransition = useViewTransition();
 
-  const filtered = useMemo(() => {
+  // Productos que pasan categoría y búsqueda, todavía sin aplicar las etiquetas.
+  // Sirve además para contar cuántos resultados daría cada etiqueta.
+  const base = useMemo(() => {
     const q = norm(query.trim());
     const terms = q ? q.split(/\s+/) : [];
     return products.filter((p) => {
       if (active !== 'all' && p.category !== active) return false;
-      if (tags.length > 0 && !tags.every((t) => p.tags.includes(t))) return false;
       if (terms.length > 0) {
         const h = haystack(p);
         if (!terms.every((t) => h.includes(t))) return false;
       }
       return true;
     });
-  }, [query, active, tags]);
+  }, [query, active]);
+
+  // Dentro de un mismo grupo de filtros la gente espera "o", no "y": marcar
+  // «Uso manual» y «Uso automático» debe mostrar ambos, no sólo los productos
+  // que sean las dos cosas a la vez.
+  const filtered = useMemo(
+    () => (tags.length === 0 ? base : base.filter((p) => tags.some((t) => p.tags.includes(t)))),
+    [base, tags],
+  );
+
+  const tagCounts = useMemo(() => {
+    const counts = {} as Record<Tag, number>;
+    for (const t of TAGS) counts[t] = base.filter((p) => p.tags.includes(t)).length;
+    return counts;
+  }, [base]);
 
   const isFiltering = active !== 'all' || tags.length > 0 || query.trim() !== '';
 
-  const reset = () => {
-    setQuery('');
-    setActive('all');
-    setTags([]);
-  };
+  // Cambiar de categoría sí se anima; escribir en el buscador no, porque una
+  // transición por cada pulsación se vería a trompicones.
+  const changeCategory = (v: CategoryId | 'all') => startTransition(() => setActive(v));
+
+  const reset = () =>
+    startTransition(() => {
+      setQuery('');
+      setActive('all');
+      setTags([]);
+    });
 
   const grid = (list: Product[], showCategory = false) => (
     <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 4 }} spacing="md" verticalSpacing="md">
@@ -98,12 +121,12 @@ export default function App() {
         query={query}
         onQuery={setQuery}
         active={active}
-        onActive={setActive}
+        onActive={changeCategory}
         quoteCount={quote.count}
         onOpenQuote={() => setQuoteOpen(true)}
       />
 
-      <Hero query={query} onQuery={setQuery} onActive={setActive} />
+      <Hero query={query} onQuery={setQuery} onActive={changeCategory} />
 
       <Container size="xl" py="xl" id="catalogo">
         <Stack gap="xl">
@@ -113,11 +136,25 @@ export default function App() {
               <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={8}>
                 Filtrar por característica
               </Text>
-              <Chip.Group multiple value={tags} onChange={(v) => setTags(v as Tag[])}>
-                <Group gap={8}>
+              <Chip.Group
+                multiple
+                value={tags}
+                onChange={(v) => startTransition(() => setTags(v as Tag[]))}
+              >
+                <Group gap={8} className={classes.filterRow} wrap="nowrap">
                   {TAGS.map((t) => (
-                    <Chip key={t} value={t} variant="outline" radius="xl" size="sm">
-                      {t}
+                    <Chip
+                      key={t}
+                      value={t}
+                      variant="outline"
+                      radius="xl"
+                      size="sm"
+                      disabled={tagCounts[t] === 0 && !tags.includes(t)}
+                    >
+                      {t}{' '}
+                      <Text span c="dimmed" fz="xs">
+                        {tagCounts[t]}
+                      </Text>
                     </Chip>
                   ))}
                 </Group>
@@ -137,9 +174,11 @@ export default function App() {
             )}
           </Group>
 
+          {/* `catalogo` es el nombre de transición: al cambiar de categoría o de
+              filtro sólo se funde esta zona, no la cabecera ni el hero. */}
           {isFiltering ? (
             /* Vista filtrada: una única rejilla con el recuento de resultados */
-            <Stack gap="md">
+            <Stack gap="md" className={classes.results}>
               <Group gap="xs">
                 <Title order={2} fz="1.5rem">
                   Resultados
@@ -167,32 +206,34 @@ export default function App() {
             </Stack>
           ) : (
             /* Vista completa: agrupada por categoría */
-            categories.map((c) => {
-              const list = products.filter((p) => p.category === c.id);
-              return (
-                <Stack key={c.id} gap="md" id={c.id}>
-                  <Box>
-                    <Group gap="xs" align="center">
-                      <Title order={2} fz="1.6rem">
-                        {c.name}
-                      </Title>
-                      <Badge variant="light" color="gray" size="lg">
-                        {list.length}
-                      </Badge>
-                    </Group>
-                    <Text c="dimmed" mt={4} maw={720}>
-                      {c.description}
-                    </Text>
-                  </Box>
-                  {grid(list)}
-                </Stack>
-              );
-            })
+            <Stack gap="xl" className={classes.results}>
+              {categories.map((c) => {
+                const list = products.filter((p) => p.category === c.id);
+                return (
+                  <Stack key={c.id} gap="md" id={c.id}>
+                    <Box>
+                      <Group gap="xs" align="center">
+                        <Title order={2} fz="1.6rem">
+                          {c.name}
+                        </Title>
+                        <Badge variant="light" color="gray" size="lg">
+                          {list.length}
+                        </Badge>
+                      </Group>
+                      <Text c="dimmed" mt={4} maw={720}>
+                        {c.description}
+                      </Text>
+                    </Box>
+                    {grid(list)}
+                  </Stack>
+                );
+              })}
+            </Stack>
           )}
         </Stack>
       </Container>
 
-      <Footer onActive={setActive} />
+      <Footer onActive={changeCategory} />
 
       <ProductDrawer
         product={detail}

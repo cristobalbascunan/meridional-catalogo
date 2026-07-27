@@ -12,8 +12,65 @@ body {
   scroll-margin-top: 120px;
 }
 
+/* ---------------------------------------------------------------- Movimiento */
+
+/*
+ * Todo lo que anima vive dentro de esta consulta, así que quien tenga activado
+ * "reducir movimiento" en su sistema ve la web completamente estática.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  /* Entrada del hero, escalonada. */
+  .mp-rise {
+    animation: mp-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes mp-rise {
+    from {
+      opacity: 0;
+      translate: 0 16px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /*
+   * Transición de vista al cambiar de categoría o de filtro. Sustituye el
+   * fundido cruzado por defecto por uno con un ligero desplazamiento.
+   */
+  ::view-transition-old(catalogo) {
+    animation: mp-fade-out 180ms ease both;
+  }
+
+  ::view-transition-new(catalogo) {
+    animation: mp-fade-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes mp-fade-out {
+    to {
+      opacity: 0;
+      translate: 0 -8px;
+    }
+  }
+
+  @keyframes mp-fade-in {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  /* Corta también las transiciones de vista si el sistema las dispara. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
