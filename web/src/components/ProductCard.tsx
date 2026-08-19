@@ -63,7 +63,7 @@ export function ProductCard({ product, showCategory, onOpen }: Props) {
             </Badge>
           )}
           {product.tags.slice(0, 2).map((t) => (
-            <Badge key={t} size="sm" variant="light" color="ocean">
+            <Badge key={t} size="sm" variant="light" color="brand">
               {t}
             </Badge>
           ))}

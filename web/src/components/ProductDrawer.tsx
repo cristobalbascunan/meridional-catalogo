@@ -76,7 +76,7 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
             {product.tags.length > 0 && (
               <Group gap={6}>
                 {product.tags.map((t) => (
-                  <Badge key={t} variant="light" color="ocean">
+                  <Badge key={t} variant="light" color="brand">
                     {t}
                   </Badge>
                 ))}

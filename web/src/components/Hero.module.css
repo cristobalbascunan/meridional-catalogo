@@ -1,9 +1,22 @@
 .hero {
   position: relative;
   isolation: isolate;
+}
+
+/*
+ * La foto va en un pseudoelemento propio para poder desaturarla: es una
+ * fotografia iluminada en rojo y, bajo un degradado azul, quedaria morada.
+ * En blanco y negro hace de textura y deja que mande el azul corporativo.
+ */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
   background-image: url('/img/hero-tapes.jpg');
   background-size: cover;
   background-position: center;
+  filter: grayscale(1) contrast(1.08) brightness(0.85);
 }
 
 .overlay {
@@ -12,9 +25,9 @@
   z-index: -1;
   background: linear-gradient(
     100deg,
-    rgba(120, 4, 8, 0.94) 0%,
-    rgba(180, 10, 14, 0.82) 45%,
-    rgba(20, 6, 8, 0.6) 100%
+    rgba(0, 58, 140, 0.94) 0%,
+    rgba(13, 109, 255, 0.82) 45%,
+    rgba(4, 20, 48, 0.62) 100%
   );
 }
 
@@ -61,7 +74,7 @@
   /* La imagen de fondo se acerca muy poco a medida que se baja: da profundidad
      sin el coste ni los saltos de un parallax hecho con JavaScript. */
   @supports (animation-timeline: view()) {
-    .hero {
+    .hero::before {
       animation: hero-zoom linear both;
       animation-timeline: view();
       animation-range: exit 0% exit 100%;

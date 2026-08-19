@@ -17,22 +17,15 @@
   flex: none;
 }
 
-/* El logotipo tiene fondo blanco opaco: se le da forma de pastilla para que
-   sobre fondo oscuro parezca intencionado y no un recorte. */
 .logo {
   height: 34px;
   width: auto;
   display: block;
-  background: #fff;
-  padding: 4px 8px;
-  border-radius: var(--mantine-radius-sm);
-  box-sizing: content-box;
 }
 
 @media (max-width: 36em) {
   .logo {
     height: 24px;
-    padding: 4px 6px;
   }
 }
 

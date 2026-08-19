@@ -1,7 +1,7 @@
 import { createTheme, type MantineColorsTuple } from '@mantine/core';
 
-/** Rojo corporativo tomado del logotipo de Meridional Plastic. */
-const brandRed: MantineColorsTuple = [
+/** Rojo del logotipo. Se reserva como color de apoyo. */
+const logoRed: MantineColorsTuple = [
   '#ffe9e9',
   '#ffd1d1',
   '#f9a2a2',
@@ -14,8 +14,8 @@ const brandRed: MantineColorsTuple = [
   '#a50007',
 ];
 
-/** Azul corporativo tomado del logotipo de Meridional Plastic. */
-const brandBlue: MantineColorsTuple = [
+/** Azul del logotipo: color principal de la web. */
+const logoBlue: MantineColorsTuple = [
   '#e6f3ff',
   '#cee2ff',
   '#9cc2ff',
@@ -31,7 +31,7 @@ const brandBlue: MantineColorsTuple = [
 export const theme = createTheme({
   primaryColor: 'brand',
   primaryShade: { light: 6, dark: 5 },
-  colors: { brand: brandRed, ocean: brandBlue },
+  colors: { brand: logoBlue, accent: logoRed },
   defaultRadius: 'md',
   fontFamily:
     "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
