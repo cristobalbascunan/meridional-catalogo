@@ -22,8 +22,6 @@ import { Hero } from './components/Hero';
 import { Footer } from './components/Footer';
 import { ProductCard } from './components/ProductCard';
 import { ProductDrawer } from './components/ProductDrawer';
-import { QuoteDrawer } from './components/QuoteDrawer';
-import { useQuote } from './hooks/useQuote';
 import {
   TAGS,
   categories,
@@ -52,10 +50,8 @@ export default function App() {
   const [active, setActive] = useState<CategoryId | 'all'>('all');
   const [tags, setTags] = useState<Tag[]>([]);
   const [detail, setDetail] = useState<Product | null>(null);
-  const [quoteOpen, setQuoteOpen] = useState(false);
   const [scroll, scrollTo] = useWindowScroll();
 
-  const quote = useQuote();
   const startTransition = useViewTransition();
 
   // Productos que pasan categoría y búsqueda, todavía sin aplicar las etiquetas.
@@ -106,10 +102,8 @@ export default function App() {
         <ProductCard
           key={p.id}
           product={p}
-          selected={quote.has(p.id)}
           showCategory={showCategory}
           onOpen={setDetail}
-          onToggle={quote.toggle}
         />
       ))}
     </SimpleGrid>
@@ -122,8 +116,6 @@ export default function App() {
         onQuery={setQuery}
         active={active}
         onActive={changeCategory}
-        quoteCount={quote.count}
-        onOpenQuote={() => setQuoteOpen(true)}
       />
 
       <Hero query={query} onQuery={setQuery} onActive={changeCategory} />
@@ -238,23 +230,13 @@ export default function App() {
       <ProductDrawer
         product={detail}
         opened={detail !== null}
-        selected={detail ? quote.has(detail.id) : false}
         onClose={() => setDetail(null)}
-        onToggle={quote.toggle}
-      />
-
-      <QuoteDrawer
-        opened={quoteOpen}
-        items={quote.items}
-        onClose={() => setQuoteOpen(false)}
-        onRemove={quote.remove}
-        onClear={quote.clear}
       />
 
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
         <Transition
           transition="slide-up"
-          mounted={scroll.y > 600 && detail === null && !quoteOpen}
+          mounted={scroll.y > 600 && detail === null}
         >
           {(styles) => (
             <Button

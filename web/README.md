@@ -1,7 +1,7 @@
 # Catálogo web · Meridional Plastic
 
 Catálogo de productos para envase y embalaje de **Meridional Plastic, S.L.**, construido a
-partir del _Catálogo de productos 2024_ en PDF. Es una web estática, sin backend, pensada
+partir del listado de productos facilitado por el cliente. Es una web estática, sin backend, pensada
 para consultarse igual de bien en móvil que en escritorio.
 
 ## Puesta en marcha
@@ -42,16 +42,16 @@ servicio `dev`, en cambio, refleja los cambios al momento.
 
 ## Qué hace
 
-- **Catálogo completo** agrupado en cinco categorías: polímeros, cintas adhesivas y
-  precintos, fleje, cartón y papel, y palets.
+- **Catálogo completo** agrupado en nueve categorías: cinta adhesiva, film estirable,
+  burbuja, foam, lámina/semitubo/bolsas, fleje y accesorios, cartón, palés y maquinaria.
 - **Buscador** sin acentos ni mayúsculas: busca en nombre, familia, descripción,
   características, referencias y etiquetas.
 - **Filtros** por categoría y por característica (impresión personalizada, uso manual,
-  uso automático, a medida, ecológico).
+  uso automático, a medida), con el número de resultados en cada una.
 - **Ficha de producto** en panel lateral (inferior en móvil) con características y
   referencias disponibles.
-- **«Mi solicitud»**: el usuario marca productos y genera un correo o un mensaje de
-  WhatsApp ya redactado. La selección se guarda en el navegador.
+- **Contacto directo**: cada ficha ofrece WhatsApp y email con el mensaje ya redactado.
+  La web **no lleva carrito** ni proceso de pedido, por indicación del cliente.
 - **Modo claro y oscuro.**
 
 ## Animaciones
@@ -83,9 +83,8 @@ independientes, ambas se componen sin pisarse.
 src/
   data/catalog.ts        Todo el contenido del catálogo (productos, categorías, contacto)
   theme.ts               Colores corporativos y tipografía
-  hooks/useQuote.ts      Lista de productos seleccionados (localStorage)
-  components/            Header, Hero, ProductCard, ProductDrawer, QuoteDrawer, Footer
-public/img/              Imágenes de producto extraídas del catálogo en PDF
+  components/            Header, Hero, ProductCard, ProductDrawer, Footer
+public/img/              Fotografías de producto
 ```
 
 ## Mantenimiento
@@ -103,13 +102,16 @@ Casi todo se toca en un único sitio: [`src/data/catalog.ts`](src/data/catalog.t
 
 ## Notas sobre el contenido
 
-- Los textos y las imágenes provienen de los PDF `CATÁLOGO 2024.pdf` y
-  `Meridional Plastic_Pliegos.pdf`.
-- Algunas familias comparten fotografía porque el PDF original solo incluye una imagen
-  para todas sus variantes (por ejemplo, los tres tipos de film estirable). Sustituir esas
-  fotos por una de cada variante es la mejora más visible que se puede hacer.
-- Unas pocas imágenes de cinta del PDF son de baja resolución (unos 150 px). Se ven
-  correctamente porque se muestran a tamaño reducido, pero conviene reemplazarlas si se
-  dispone de los originales.
+- El listado de productos sigue `latest/LISTADO DE PRODUCTOS WEB.xlsx`. Donde el Excel
+  indica «TEXTO CATALOGO» se conserva la redacción del catálogo de 2024 en PDF.
+- Parte de las fotografías las envió el cliente (carpeta `latest/`) y el resto se
+  extrajeron de los PDF del catálogo y de las fichas técnicas de maquinaria.
+- Faltan fotos propias de: mesa flejadora semiautomática (usa de momento la de la
+  flejadora manual) y tensores (comparte foto con la flejadora manual).
+- Las hebillas y los enlazadores («fichas») se muestran a menor tamaño mediante
+  `imageSize: "sm"`, porque estaban fotografiados de cerca y se veían desproporcionados
+  junto a una bobina.
+- Algunas fotos llevan la marca del fabricante de la máquina (Robopac) porque proceden de
+  su ficha técnica; conviene confirmar que se pueden publicar así.
 - El PDF indica el código postal de dos formas distintas (50171 y 50172). Se ha usado
   **50171**, que es el de La Puebla de Alfindén; conviene confirmarlo.

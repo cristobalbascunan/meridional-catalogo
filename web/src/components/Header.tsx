@@ -7,15 +7,14 @@ import {
   CloseButton,
   Container,
   Group,
-  Indicator,
   ScrollArea,
   TextInput,
   Tooltip,
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core';
-import { IconMoon, IconSearch, IconShoppingBag, IconSun } from '@tabler/icons-react';
-import { asset, categories, type CategoryId } from '../data/catalog';
+import { IconBrandWhatsapp, IconMoon, IconSearch, IconSun } from '@tabler/icons-react';
+import { COMPANY, asset, categories, type CategoryId } from '../data/catalog';
 import classes from './Header.module.css';
 
 interface Props {
@@ -23,11 +22,9 @@ interface Props {
   onQuery: (v: string) => void;
   active: CategoryId | 'all';
   onActive: (v: CategoryId | 'all') => void;
-  quoteCount: number;
-  onOpenQuote: () => void;
 }
 
-export function Header({ query, onQuery, active, onActive, quoteCount, onOpenQuote }: Props) {
+export function Header({ query, onQuery, active, onActive }: Props) {
   const { setColorScheme } = useMantineColorScheme();
   const scheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const [searchOpen, setSearchOpen] = useState(false);
@@ -35,6 +32,8 @@ export function Header({ query, onQuery, active, onActive, quoteCount, onOpenQuo
   // Con una búsqueda activa el campo permanece visible aunque no se haya desplegado
   // a mano, para que se vea qué se está filtrando.
   const showSearchRow = searchOpen || query !== '';
+
+  const whatsapp = `https://wa.me/${COMPANY.phoneRaw}`;
 
   // El campo se monta una sola vez (se muestra y oculta por CSS), así que hay que
   // enfocarlo a mano al desplegarlo: `autoFocus` solo actuaría en el montaje.
@@ -109,30 +108,31 @@ export function Header({ query, onQuery, active, onActive, quoteCount, onOpenQuo
               </ActionIcon>
             </Tooltip>
 
-            <Indicator
-              label={quoteCount}
-              size={18}
-              disabled={quoteCount === 0}
-              color="ocean"
-              offset={4}
+            <Button
+              className={classes.waFull}
+              component="a"
+              href={whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              color="teal"
+              leftSection={<IconBrandWhatsapp size={18} />}
             >
-              <Button
-                className={classes.quoteFull}
-                leftSection={<IconShoppingBag size={18} />}
-                onClick={onOpenQuote}
-              >
-                Mi solicitud
-              </Button>
-              <ActionIcon
-                className={classes.quoteIcon}
-                size="lg"
-                radius="xl"
-                aria-label="Mi solicitud"
-                onClick={onOpenQuote}
-              >
-                <IconShoppingBag size={18} />
-              </ActionIcon>
-            </Indicator>
+              WhatsApp
+            </Button>
+            <ActionIcon
+              className={classes.waIcon}
+              component="a"
+              href={whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              color="teal"
+              variant="filled"
+              size="lg"
+              radius="xl"
+              aria-label="Contactar por WhatsApp"
+            >
+              <IconBrandWhatsapp size={18} />
+            </ActionIcon>
           </Group>
         </Group>
 

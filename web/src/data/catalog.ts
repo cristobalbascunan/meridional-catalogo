@@ -1,9 +1,21 @@
 /**
- * Contenido transcrito del "Catálogo de productos 2024" de Meridional Plastic, S.L.
- * Las imágenes proceden del mismo catálogo (ver public/img).
+ * Listado de productos de la web de Meridional Plastic, S.L.
+ *
+ * El contenido sigue el fichero "LISTADO DE PRODUCTOS WEB.xlsx" facilitado por
+ * el cliente. Donde el Excel indica «TEXTO CATALOGO» se conserva la redacción
+ * del catálogo de 2024 en PDF.
  */
 
-export type CategoryId = "polimeros" | "cintas" | "fleje" | "carton" | "palets";
+export type CategoryId =
+  | "cintas"
+  | "film"
+  | "burbuja"
+  | "foam"
+  | "polietileno"
+  | "fleje"
+  | "carton"
+  | "pales"
+  | "maquinaria";
 
 export interface Category {
   id: CategoryId;
@@ -20,6 +32,8 @@ export interface Product {
   /** Familia dentro de la categoría, se usa como subtítulo y para agrupar. */
   family: string;
   image: string;
+  /** Piezas pequeñas (hebillas, fichas): se muestran a menor tamaño. */
+  imageSize?: "sm";
   summary: string;
   specs: string[];
   /** Etiquetas transversales, usadas por el filtro rápido. */
@@ -33,19 +47,11 @@ export const TAGS = [
   "Uso manual",
   "Uso automático",
   "A medida",
-  "Ecológico",
 ] as const;
 
 export type Tag = (typeof TAGS)[number];
 
-/**
- * Resuelve una ruta de `public/` contra la base de despliegue.
- *
- * Vite reescribe las rutas que aparecen en el HTML y el CSS, pero no las que
- * viven en cadenas de texto como las de este fichero. Sin esto, al publicar en
- * un subdirectorio (por ejemplo GitHub Pages en `usuario.github.io/repo/`)
- * `/img/foo.jpg` apuntaría a la raíz del dominio y ninguna imagen cargaría.
- */
+/** Resuelve una ruta de public/ contra la base de despliegue. */
 export const asset = (path: string) =>
   `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
 
@@ -54,163 +60,358 @@ export const COMPANY = {
   claim: "Productos para envase y embalaje",
   address: "Pol. Ind. Malpica Alfindén, Calle F, Nave 14",
   city: "50171 La Puebla de Alfindén, Zaragoza, España",
-  email: "comercial@meridionalplastic.com",
-  phone: "+34 625 473 361",
-  /** Mismo número en formato internacional sin separadores, para enlaces wa.me */
-  phoneRaw: "34625473361",
+  email: "info@meridionalplastic.com",
+  phone: "976 158 711",
+  /** Mismo número sin separadores, para los enlaces tel: y wa.me */
+  phoneRaw: "34976158711",
   catalogYear: 2026,
 };
 
 const rawCategories: Category[] = [
   {
-    id: "polimeros",
-    name: "Polímeros",
-    tagline: "Film, burbuja, espuma y bolsas",
-    description:
-      "Film estirable, lámina y semitubo, plástico burbuja, foam y bolsas para proteger y agrupar cualquier tipo de carga.",
-    image: "/img/film-estirable.jpg",
-  },
-  {
     id: "cintas",
-    name: "Cintas adhesivas y precintos",
-    tagline: "Precinto impreso y cintas técnicas",
+    name: "Cinta adhesiva",
+    tagline: "Precintos y precintadoras",
     description:
-      "Precinto en polipropileno y PVC con todo tipo de adhesivos, cintas técnicas y precintadoras manuales.",
+      "Precinto de polipropileno en acrílico y solvente, manual y automático, impreso en hasta tres colores para personalizarlo con el logo de su empresa.",
     image: "/img/precinto-impreso.jpg",
   },
   {
-    id: "fleje",
-    name: "Fleje y flejado",
-    tagline: "Fleje y herramientas",
+    id: "film",
+    name: "Film estirable",
+    tagline: "Manual, automático y minifilm",
     description:
-      "Fleje de polipropileno, poliéster, textil y metálico, además de las herramientas y accesorios para aplicarlo.",
+      "Film estirable de polietileno de baja densidad para paletizar de forma manual o automática, con posibilidad de impresión.",
+    image: "/img/film-estirable.jpg",
+  },
+  {
+    id: "burbuja",
+    name: "Burbuja",
+    tagline: "Bobinas, bolsas y formatos",
+    description:
+      "Bobinas, bolsas y formatos de burbuja para proteger sus productos durante el almacenaje y el transporte, también combinada con Kraft, foam o PET metalizado.",
+    image: "/img/bobina-burbuja.jpg",
+  },
+  {
+    id: "foam",
+    name: "Foam",
+    tagline: "Bobinas, perfiles y cantoneras",
+    description:
+      "Espuma de polietileno expandido de baja densidad: protección efectiva contra impactos con un alto rendimiento a un coste contenido.",
+    image: "/img/foam-bobina.jpg",
+  },
+  {
+    id: "polietileno",
+    name: "Lámina, semitubo y bolsas",
+    tagline: "Retráctil, semitubo y bolsas",
+    description:
+      "Lámina retráctil, semitubo y todo tipo de bolsas en polietileno de baja densidad y polipropileno.",
+    image: "/img/lamina-retractil.jpg",
+  },
+  {
+    id: "fleje",
+    name: "Fleje y accesorios",
+    tagline: "Fleje, flejadoras y herramientas",
+    description:
+      "Fleje de polipropileno, poliéster, textil y metálico, con las flejadoras, tensores y accesorios necesarios para aplicarlo.",
     image: "/img/fleje-pet.jpg",
   },
   {
     id: "carton",
-    name: "Cartón y papel",
-    tagline: "Cajas, cantoneras y bobinas",
+    name: "Cartón",
+    tagline: "Cajas y cantoneras",
     description:
-      "Cajas estándar y a medida, cantoneras de protección y bobinas de cartón ondulado y papel kraft.",
+      "Cajas de canal simple y doble, estándar o a medida, y cantoneras para reforzar las esquinas en la paletización.",
     image: "/img/cajas-carton.jpg",
   },
   {
-    id: "palets",
-    name: "Palets",
-    tagline: "Paletina, ligero, semifuerte y europeo",
+    id: "pales",
+    name: "Palés",
+    tagline: "Medidas estándar y de segundo uso",
     description:
-      "Palets de madera en los formatos más habituales para la expedición y el almacenaje de mercancías.",
+      "Palés de polietileno de alta densidad y palés de segundo uso en las medidas más habituales.",
     image: "/img/palets.jpg",
+  },
+  {
+    id: "maquinaria",
+    name: "Maquinaria",
+    tagline: "Envolvedoras de film estirable",
+    description:
+      "Envolvedoras de film estirable: mesa rotativa, brazo giratorio y robot autopropulsado.",
+    image: "/img/envolvedora-ecoplat.jpg",
   },
 ];
 
 const rawProducts: Product[] = [
-  /* ---------------------------------------------------------------- POLÍMEROS */
+  /* ----------------------------------------------------------- CINTA ADHESIVA */
   {
-    id: "film-manual",
-    name: "Film estirable · Uso manual",
-    category: "polimeros",
-    family: "Film estirable",
-    image: "/img/film-estirable.jpg",
+    id: "precinto-acrilico",
+    name: "Precinto polipropileno acrílico",
+    category: "cintas",
+    family: "Precinto",
+    image: "/img/pp-acrilico.jpg",
     summary:
-      "Film estirable A-500 para paletizado manual, disponible en tres espesores y con opción de impresión de su logotipo.",
+      "Precinto de polipropileno con adhesivo acrílico de base agua, en cajas de 36 rollos.",
     specs: [
-      "Referencia A-500 en 12, 17 y 23 my",
-      "Disponible en transparente, blanco y negro",
-      "Distintos anchos disponibles",
-      "Posibilidad de imprimir su logotipo",
-    ],
-    variants: ["A-500 12 my", "A-500 17 my", "A-500 23 my"],
-    tags: ["Impresión personalizada", "Uso manual"],
-  },
-  {
-    id: "film-automatico",
-    name: "Film estirable · Uso automático",
-    category: "polimeros",
-    family: "Film estirable",
-    image: "/img/film-estirable.jpg",
-    summary:
-      "Film estirable para aplicación con máquina automática, con amplia gama de anchos, espesores y niveles de pre-estiro.",
-    specs: [
-      "Referencia A-500 en 12, 17 y 23 my",
-      "Aplicación con máquina automática",
-      "Disponible en transparente, blanco y negro",
-      "Variedad de referencias en anchos, espesores y con pre-estiro",
-      "Posibilidad de impresión a tres colores",
-    ],
-    variants: ["A-500 12 my", "A-500 17 my", "A-500 23 my"],
-    tags: ["Impresión personalizada", "Uso automático"],
-  },
-  {
-    id: "film-miniflex",
-    name: "Miniflex",
-    category: "polimeros",
-    family: "Film estirable",
-    image: "/img/film-estirable.jpg",
-    summary:
-      "Mini bobina de film estirable de 100 mm para agrupar bultos, sujetar cargas ligeras y trabajos de detalle.",
-    specs: [
-      "Ancho 100 mm, espesor 23 my",
-      "Acabado transparente",
-      "Aplicación manual y automática",
+      "Cajas de 36 rollos",
+      "Fabricado en polipropileno con adhesivo acrílico (base agua)",
+      "Disponible en color marrón y transparente",
     ],
     tags: ["Uso manual", "Uso automático"],
   },
   {
-    id: "lamina-semitubo",
-    name: "Lámina y semitubo · Bobinas de polietileno",
-    category: "polimeros",
-    family: "Lámina y semitubo",
-    image: "/img/lamina-semitubo.jpg",
+    id: "precinto-solvente",
+    name: "Precinto polipropileno solvente",
+    category: "cintas",
+    family: "Precinto",
+    image: "/img/pp-solvente.jpg",
     summary:
-      "Bobinas de polietileno en alta y baja densidad, en lámina o semitubo, con anchos de hasta 1.900 mm.",
+      "Adhesivo solvente de caucho natural con excelente adhesión incluso en cartón reciclado.",
     specs: [
-      "Polietileno en alta y baja densidad",
-      "Ancho hasta 1.900 mm",
-      "Disponible también en versión retráctil",
+      "Cajas de 36 rollos",
+      "Fabricado en polipropileno con adhesivo solvente de caucho natural",
+      "Excelente adhesión incluso en cartón reciclado",
+      "Aguanta temperaturas extremas y la humedad",
+      "Disponible en color marrón y transparente",
+    ],
+    tags: ["Uso manual", "Uso automático"],
+  },
+  {
+    id: "precinto-impreso",
+    name: "Precinto impreso",
+    category: "cintas",
+    family: "Precinto",
+    image: "/img/precinto-impreso.jpg",
+    summary:
+      "Precinto personalizado con el logo de su empresa, hasta 3 tintas y fondo negativo.",
+    specs: [
+      "Cajas de 36 rollos",
+      "Fabricado en polipropileno solvente de máxima calidad",
+      "Distintos colores",
+      "Impresión hasta 3 tintas y fondo negativo",
+    ],
+    tags: ["Impresión personalizada", "Uso manual", "Uso automático"],
+  },
+  {
+    id: "precinto-muy-fragil",
+    name: "Precinto impreso fondo blanco «MUY FRÁGIL»",
+    category: "cintas",
+    family: "Precinto",
+    image: "/img/precinto-muy-fragil.jpg",
+    summary:
+      "Precinto de aviso con fondo blanco e impresión «MUY FRÁGIL» para señalizar sus expediciones.",
+    specs: ["Presentación en cajas de 36 rollos", "Medida 36 × 48 mm"],
+    tags: ["Uso manual"],
+  },
+  {
+    id: "precinto-automatico",
+    name: "Precinto PP solvente transparente · uso automático",
+    category: "cintas",
+    family: "Precinto",
+    image: "/img/precinto-automatico.jpg",
+    summary:
+      "Bobinas para precintadora automática, en presentación de 6 rollos por caja.",
+    specs: [
+      "Presentación en cajas de 6 rollos",
+      "Se utiliza para precintar cajas con máquina automática",
+    ],
+    tags: ["Uso automático"],
+  },
+  {
+    id: "precintadora",
+    name: "Precintadora manual 50 mm",
+    category: "cintas",
+    family: "Precintadoras",
+    image: "/img/precintadora.jpg",
+    summary:
+      "Precintadora manual de 50 mm con freno ajustable y cubierta de seguridad en la hoja de corte.",
+    specs: [
+      "Freno ajustable",
+      "Ideal para cierre de cajas",
+      "Cubierta de seguridad en la hoja de corte",
+      "De fácil manejo",
+    ],
+    tags: ["Uso manual"],
+  },
+  {
+    id: "precintadora-metal",
+    name: "Precintadora manual 50 mm metálica",
+    category: "cintas",
+    family: "Precintadoras",
+    image: "/img/precintadora-metal.jpg",
+    summary:
+      "Versión metálica para uso intensivo: más duradera y precisa, y de fácil manejo.",
+    specs: [
+      "Utilización para uso intensivo",
+      "De fácil manejo",
+      "Metálica, más duradera y precisa",
+    ],
+    tags: ["Uso manual"],
+  },
+
+  /* ----------------------------------------------------------- FILM ESTIRABLE */
+  {
+    id: "film-manual",
+    name: "Film ancho 500 · 23 my · manual",
+    category: "film",
+    family: "Film estirable",
+    image: "/img/film-estirable.jpg",
+    summary:
+      "Film estirable de polietileno de baja densidad (PEBD), en cajas de 6 bobinas, para paletizar su mercancía de forma manual.",
+    specs: [
+      "Ancho 500 · 23 my · 1,5 kg (mandril de 300 g)",
+      "Presentado en cajas de 6 bobinas",
+      "60 cajas por palé",
+      "Kilos reales",
+    ],
+    tags: ["Uso manual"],
+  },
+  {
+    id: "minifilm",
+    name: "Minifilm",
+    category: "film",
+    family: "Film estirable",
+    image: "/img/minifilm.jpg",
+    summary:
+      "Film de ancho 100 en polietileno de baja densidad (PEBD), muy sencillo y ágil de utilizar.",
+    specs: [
+      "Ancho 100",
+      "Cajas de 54 bobinas",
+      "Unión de pequeños paquetes y protección de superficies delicadas",
+    ],
+    tags: ["Uso manual"],
+  },
+  {
+    id: "film-automatico",
+    name: "Film ancho 500 · 23 my · uso automático",
+    category: "film",
+    family: "Film estirable",
+    image: "/img/film-impreso.jpg",
+    summary:
+      "Film estirable para paletizar de forma automática con envolvedora, en palé de 750 kg o en bobinas sueltas.",
+    specs: [
+      "Polietileno de baja densidad (PEBD)",
+      "Presentación en palé de 750 kg o bobinas sueltas",
+      "Disponible en transparente y en color",
+      "Posibilidad de impresión en 3 colores",
+    ],
+    tags: ["Uso automático", "Impresión personalizada"],
+  },
+
+  /* ----------------------------------------------------------------- BURBUJA */
+  {
+    id: "bolsa-burbuja",
+    name: "Bolsa de burbuja",
+    category: "burbuja",
+    family: "Bolsas y formatos",
+    image: "/img/bolsa-burbuja.jpg",
+    summary:
+      "Bolsas bidimensionales para la protección y separación de productos sensibles a los golpes y las rayaduras.",
+    specs: [
+      "Diversidad de materiales y medidas",
+      "Con solapa y con autocierre",
+      "Versión antiestática",
+      "Laminados con foam",
     ],
     tags: ["A medida"],
   },
   {
-    id: "bopp",
-    name: "Bobinas de polipropileno biorientado",
-    category: "polimeros",
-    family: "Lámina y semitubo",
-    image: "/img/lamina-semitubo.jpg",
+    id: "formato-burbuja",
+    name: "Formatos y planchas",
+    category: "burbuja",
+    family: "Bolsas y formatos",
+    image: "/img/burbuja.jpg",
     summary:
-      "Bobinas de BOPP, PVC, poliolefina y poliéster para envasado y retractilado, con impresión hasta tres colores.",
-    specs: [
-      "Polipropileno biorientado, PVC, poliolefina y poliéster",
-      "Variedad de anchos y espesores",
-      "Posibilidad de impresión a tres colores",
-    ],
-    tags: ["Impresión personalizada", "A medida"],
+      "Formatos y planchas cortados a medida que facilitan el apilamiento del producto en el palé.",
+    specs: ["Formatos y planchas a medida", "En distintos materiales"],
+    tags: ["A medida"],
   },
   {
-    id: "foam-bobina",
-    name: "Bobinas de espuma (foam)",
-    category: "polimeros",
+    id: "bobina-burbuja",
+    name: "Bobinas de burbuja",
+    category: "burbuja",
+    family: "Bobinas",
+    image: "/img/bobina-burbuja.jpg",
+    summary:
+      "Bobinas de burbuja de polietileno de baja densidad para proteger sus productos durante el almacenaje y el transporte.",
+    specs: [
+      "Fácil manejo en el proceso de embalado",
+      "Distintos anchos, gramajes y materiales",
+      "Posibilidad de cortes y precorte a medida",
+      "Ancho hasta 2.600 mm",
+    ],
+    tags: ["A medida"],
+  },
+  {
+    id: "burbuja-kraft",
+    name: "Burbuja con papel Kraft",
+    category: "burbuja",
+    family: "Bobinas",
+    image: "/img/burbuja-kraft.jpg",
+    summary:
+      "Bobinas de burbuja con papel Kraft para una protección total de la mercancía.",
+    specs: ["Protección total", "Evita las roturas por cantos afilados o golpes"],
+    tags: [],
+  },
+  {
+    id: "burbuja-foam",
+    name: "Burbuja con foam",
+    category: "burbuja",
+    family: "Bobinas",
+    image: "/img/burbuja-foam.jpg",
+    summary:
+      "Bobina de burbuja con foam, disponible en distintos grosores y a una o dos caras.",
+    specs: [
+      "Distintos grosores",
+      "A una y dos caras",
+      "Buena absorción de los golpes",
+    ],
+    tags: [],
+  },
+  {
+    id: "burbuja-pet",
+    name: "Burbuja con PET metalizado",
+    category: "burbuja",
+    family: "Bobinas",
+    image: "/img/burbuja-pet.jpg",
+    summary:
+      "Bobina de burbuja con poliéster metalizado a una o dos caras, excelente aislante térmico.",
+    specs: [
+      "Poliéster metalizado",
+      "A una o dos caras",
+      "Excelente aislante térmico",
+    ],
+    tags: [],
+  },
+
+  /* -------------------------------------------------------------------- FOAM */
+  {
+    id: "foam-bobinas",
+    name: "Bobinas de foam",
+    category: "foam",
     family: "Foam",
     image: "/img/foam-bobina.jpg",
     summary:
-      "Bobina de espuma de polietileno expandido de baja densidad para la protección de superficies delicadas.",
+      "La bobina de espuma de polietileno expandido de baja densidad protege eficazmente contra los impactos, con un alto rendimiento a un coste contenido.",
     specs: [
-      "Espuma de polietileno expandido en baja densidad",
-      "Diversas medidas y espesores",
+      "Espuma de polietileno expandido de baja densidad",
+      "Protección efectiva contra impactos",
+      "En distintos anchos y espesores",
     ],
     tags: ["A medida"],
   },
   {
-    id: "perfil-espuma",
-    name: "Perfil de espuma",
-    category: "polimeros",
+    id: "perfil-cantoneras",
+    name: "Perfiles y cantoneras de foam",
+    category: "foam",
     family: "Foam",
     image: "/img/perfil-espuma.jpg",
     summary:
-      "Perfiles de espuma de polietileno expandido para proteger cantos, esquinas y piezas de perfilería.",
+      "Perfiles y cantoneras en espuma de polietileno expandido que absorben los impactos y protegen frente a daños y arañazos.",
     specs: [
-      "Fabricado en polietileno expandido",
-      "Cinco geometrías disponibles",
+      "Espuma de polietileno expandido de baja densidad",
+      "Absorben eficazmente los impactos",
+      "Protección contra daños y arañazos",
     ],
     variants: [
       "Perfil U",
@@ -221,327 +422,57 @@ const rawProducts: Product[] = [
     ],
     tags: ["A medida"],
   },
+
+  /* ------------------------------------------------ LÁMINA, SEMITUBO Y BOLSAS */
   {
-    id: "burbuja-pe",
-    name: "Plástico burbuja · Bobinas de polietileno",
-    category: "polimeros",
-    family: "Plástico burbuja",
-    image: "/img/burbuja.jpg",
+    id: "lamina-retractil",
+    name: "Lámina retráctil",
+    category: "polietileno",
+    family: "Lámina",
+    image: "/img/lamina-retractil.jpg",
     summary:
-      "Bobinas de plástico burbuja de polietileno en cinco anchos estándar y distintos espesores.",
+      "Lámina de polietileno de baja densidad con gran capacidad de retracción, que se adapta a la forma del producto.",
     specs: [
-      "Anchos de 1,00 · 1,20 · 1,50 · 1,60 y 2,00 m",
-      "Disponible en distintos espesores",
-    ],
-    variants: ["1,00 m", "1,20 m", "1,50 m", "1,60 m", "2,00 m"],
-    tags: ["A medida"],
-  },
-  {
-    id: "burbuja-kraft",
-    name: "Bobinas de burbuja con Kraft",
-    category: "polimeros",
-    family: "Plástico burbuja",
-    image: "/img/burbuja.jpg",
-    summary:
-      "Burbuja laminada con papel Kraft: máxima protección y aislamiento térmico, en color marrón.",
-    specs: [
-      "Burbuja con Kraft de máxima protección",
-      "Color marrón",
-      "Aislante térmico, también para construcción",
+      "Fabricada en polietileno de baja densidad",
+      "Gran capacidad de retracción: se adapta a la forma del producto",
+      "Alta protección y estabilidad en el transporte y el almacenamiento",
     ],
     tags: [],
   },
   {
-    id: "burbuja-aluminio",
-    name: "Bobinas de burbuja con aluminio doble capa",
-    category: "polimeros",
-    family: "Plástico burbuja",
-    image: "/img/burbuja.jpg",
+    id: "semitubo",
+    name: "Semitubo",
+    category: "polietileno",
+    family: "Semitubo",
+    image: "/img/lamina-semitubo.jpg",
     summary:
-      "Burbuja con acabado de aluminio en doble capa, para protección reforzada y aislamiento reflectante.",
+      "Semitubo de polietileno que permite su apertura doblando el ancho para abarcar más producto.",
     specs: [
-      "Doble capa de burbuja con aluminio",
-      "Protección y aislamiento reforzados",
-    ],
-    tags: [],
-  },
-  {
-    id: "burbuja-formatos",
-    name: "Bolsas y formatos en PE burbuja",
-    category: "polimeros",
-    family: "Plástico burbuja",
-    image: "/img/burbuja.jpg",
-    summary:
-      "Bolsas y formatos ya cortados en polietileno burbuja, listos para envolver y expedir.",
-    specs: [
-      "Bolsas y formatos en PE burbuja",
-      "Medidas adaptadas a su producto",
+      "Fabricado en polietileno de baja y alta densidad",
+      "Permite su apertura doblando el ancho",
+      "Distintos anchos, hasta 1.900 mm",
+      "Gramaje desde galga 100",
     ],
     tags: ["A medida"],
   },
   {
     id: "bolsas",
-    name: "Bolsas de polietileno y polipropileno",
-    category: "polimeros",
+    name: "Bolsas",
+    category: "polietileno",
     family: "Bolsas",
     image: "/img/bolsas.jpg",
     summary:
-      "Todo tipo de bolsa para uso industrial y comercio, con impresión hasta tres colores y opción de autocierre.",
+      "Todo tipo de bolsas en polietileno de baja densidad y polipropileno, para industria, comercio y alimentación.",
     specs: [
-      "Fabricadas en polietileno y polipropileno",
-      "Todo tipo de bolsa para uso industrial y comercio",
-      "Impresión hasta 3 colores",
-      "Disponible con autocierre",
+      "Polietileno de baja densidad y polipropileno",
+      "Impresas y anónimas",
+      "Distintos tamaños y gramajes",
+      "Estándar, troqueladas, con y sin asas, autocierre",
     ],
     tags: ["Impresión personalizada", "A medida"],
   },
-  {
-    id: "packing-list",
-    name: "Packing list · Sobres portadocumentos",
-    category: "polimeros",
-    family: "Material de envío",
-    image: "/img/packing-list.jpg",
-    summary:
-      "Sobres adhesivos que facilitan el envío de la documentación junto a la mercancía.",
-    specs: [
-      "Facilitan el envío de documentación en sus expediciones",
-      "Diferentes tamaños",
-      "Con o sin impresión «CONTIENE DOCUMENTACIÓN»",
-    ],
-    tags: ["Impresión personalizada"],
-  },
-  {
-    id: "etiquetas-envio",
-    name: "Etiquetas de envío",
-    category: "polimeros",
-    family: "Material de envío",
-    image: "/img/etiquetas-envio.jpg",
-    summary:
-      "Etiquetas en papel flúor con textos de aviso preimpresos para señalizar sus expediciones.",
-    specs: [
-      "Etiquetas en papel flúor",
-      "Textos: «MUY FRÁGIL» o «CONTIENE ALBARÁN»",
-    ],
-    variants: ["MUY FRÁGIL", "CONTIENE ALBARÁN"],
-    tags: [],
-  },
 
-  /* ------------------------------------------------------------------ CINTAS */
-  {
-    id: "precinto-impreso",
-    name: "Precinto impreso",
-    category: "cintas",
-    family: "Precinto",
-    image: "/img/precinto-impreso.jpg",
-    summary:
-      "Precinto personalizado con su marca, en polipropileno y PVC, para uso manual y automático.",
-    specs: [
-      "Para uso manual y automático",
-      "Fabricado en polipropileno y PVC",
-      "Disponible en transparente, marrón y blanco",
-      "Impresión máxima en 3 colores",
-      "Distintas medidas y variedad de adhesivos",
-    ],
-    variants: [
-      "PP acrílico · adhesivo acrílico base agua",
-      "PP hotmelt · adhesivo de caucho sintético",
-      "PP solvente · adhesivo de caucho natural",
-      "PVC · adhesivo de caucho natural",
-    ],
-    tags: ["Impresión personalizada", "Uso manual", "Uso automático"],
-  },
-  {
-    id: "pp-acrilico",
-    name: "Cinta adhesiva PP acrílico",
-    category: "cintas",
-    family: "Cintas adhesivas",
-    image: "/img/pp-acrilico.jpg",
-    summary:
-      "Adhesivo acrílico de base agua y alta calidad, apto para aplicación manual y automática.",
-    specs: [
-      "Adhesivo acrílico (base al agua) de alta calidad",
-      "Aplicación manual y automática",
-      "Aguanta temperaturas extremas",
-      "Colores: transparente, blanco y marrón",
-      "Distintas medidas",
-    ],
-    tags: ["Uso manual", "Uso automático"],
-  },
-  {
-    id: "pp-hotmelt",
-    name: "Cinta adhesiva PP hotmelt",
-    category: "cintas",
-    family: "Cintas adhesivas",
-    image: "/img/pp-hotmelt.jpg",
-    summary:
-      "Adhesivo de caucho sintético con excelente adhesión y resistencia a temperaturas extremas.",
-    specs: [
-      "Adhesivo de caucho sintético",
-      "Excelente adhesión",
-      "Aguanta temperaturas extremas",
-      "Colores: transparente, blanco y marrón",
-      "Distintas medidas",
-    ],
-    tags: ["Uso manual", "Uso automático"],
-  },
-  {
-    id: "pp-solvente",
-    name: "Cinta adhesiva PP solvente",
-    category: "cintas",
-    family: "Cintas adhesivas",
-    image: "/img/pp-solvente.jpg",
-    summary:
-      "Adhesivo de caucho natural con excelente agarre incluso sobre cartón reciclado.",
-    specs: [
-      "Adhesivo de caucho natural",
-      "Excelente adhesión incluso en cartón reciclado",
-      "Aguanta temperaturas extremas y humedad",
-      "Colores: transparente, blanco y marrón",
-      "Distintas medidas",
-    ],
-    tags: ["Uso manual", "Uso automático"],
-  },
-  {
-    id: "cinta-pvc",
-    name: "Cinta adhesiva PVC",
-    category: "cintas",
-    family: "Cintas adhesivas",
-    image: "/img/cinta-pvc.jpg",
-    summary:
-      "Soporte rígido de PVC con adhesivo de caucho natural: fuerte adhesión, sin residuo y sin ruido al desenrollar.",
-    specs: [
-      "Adhesivo de caucho natural",
-      "No deja residuo y no hace ruido",
-      "Soporte rígido y fuerte adhesión",
-      "Colores: transparente, blanco y marrón",
-      "Distintas medidas",
-    ],
-    tags: ["Uso manual"],
-  },
-  {
-    id: "cinta-masking",
-    name: "Cinta masking",
-    category: "cintas",
-    family: "Cintas técnicas",
-    image: "/img/cinta-masking.jpg",
-    summary:
-      "Papel crepado con adhesivo de caucho natural, ideal para enmascarado en carrocería. No deja residuo.",
-    specs: [
-      "Papel crepado con adhesivo de caucho natural",
-      "Ideal para carrocería",
-      "No deja residuo",
-    ],
-    tags: ["Uso manual"],
-  },
-  {
-    id: "cinta-kraft",
-    name: "Cinta de papel Kraft y reforzado",
-    category: "cintas",
-    family: "Cintas técnicas",
-    image: "/img/cinta-kraft.jpg",
-    summary:
-      "Cinta de papel con base de caucho natural, producto ecológico en color marrón.",
-    specs: ["Base de caucho natural", "Producto ecológico", "Color marrón"],
-    variants: ["Papel Kraft", "Papel Kraft reforzado"],
-    tags: ["Ecológico"],
-  },
-  {
-    id: "cinta-doble-cara",
-    name: "Cinta doble cara",
-    category: "cintas",
-    family: "Cintas técnicas",
-    image: "/img/cinta-doble-cara.jpg",
-    summary:
-      "Adhesivo por las dos caras, ideal para unir materiales ligeros de forma invisible.",
-    specs: [
-      "Adhesivo en los dos lados",
-      "Ideal para unir materiales ligeros",
-      "Transparente",
-    ],
-    tags: ["Uso manual"],
-  },
-  {
-    id: "cinta-papel-eco",
-    name: "Cinta de papel Eco",
-    category: "cintas",
-    family: "Cintas técnicas",
-    image: "/img/cinta-papel-eco.jpg",
-    summary:
-      "Cinta ecológica de base caucho natural en color marrón, personalizable con más de tres colores de impresión.",
-    specs: [
-      "Base de caucho natural, producto ecológico",
-      "Color marrón",
-      "Impresión en más de 3 colores",
-    ],
-    tags: ["Ecológico", "Impresión personalizada"],
-  },
-  {
-    id: "cinta-aislante",
-    name: "Cinta aislante",
-    category: "cintas",
-    family: "Cintas técnicas",
-    image: "/img/cinta-aislante.jpg",
-    summary:
-      "Cinta de poliéster y polietileno con adhesivo de caucho natural, en gris y negro.",
-    specs: [
-      "Fabricada en poliéster y polietileno",
-      "Adhesivo de caucho natural",
-      "Colores: gris y negro",
-    ],
-    tags: ["Uso manual"],
-  },
-  {
-    id: "cinta-strapping",
-    name: "Cinta strapping",
-    category: "cintas",
-    family: "Cintas técnicas",
-    image: "/img/cinta-strapping.jpg",
-    summary:
-      "Cinta de polipropileno de alta resistencia en color naranja, pensada para sujetar cargas pesadas.",
-    specs: [
-      "Polipropileno de alta resistencia",
-      "Ideal para mantener las cargas pesadas",
-      "Color naranja",
-    ],
-    tags: ["Uso manual"],
-  },
-  {
-    id: "precintadora",
-    name: "Precintadora manual 50 mm",
-    category: "cintas",
-    family: "Herramientas",
-    image: "/img/precintadora.jpg",
-    summary:
-      "Precintadora manual de 50 mm con freno ajustable y cubierta de seguridad en la hoja de corte.",
-    specs: [
-      "Ancho de cinta 50 mm",
-      "Freno ajustable",
-      "Ideal para cierre de cajas",
-      "Cubierta de seguridad en la hoja de corte",
-      "Fácil manejo · color rojo",
-    ],
-    tags: ["Uso manual"],
-  },
-  {
-    id: "precintadora-metal",
-    name: "Precintadora manual metálica 50 mm",
-    category: "cintas",
-    family: "Herramientas",
-    image: "/img/precintadora-metal.jpg",
-    summary:
-      "Versión metálica para uso intensivo, con freno ajustable y cubierta de seguridad.",
-    specs: [
-      "Ancho de cinta 50 mm",
-      "Construcción metálica para uso intensivo",
-      "Freno ajustable",
-      "Ideal para cierre de cajas",
-      "Cubierta de seguridad en la hoja de corte",
-      "Fácil manejo · color rojo",
-    ],
-    tags: ["Uso manual"],
-  },
-
-  /* -------------------------------------------------------------------- FLEJE */
+  /* ------------------------------------------------------------------- FLEJE */
   {
     id: "fleje-pp",
     name: "Fleje de polipropileno",
@@ -583,9 +514,9 @@ const rawProducts: Product[] = [
     family: "Fleje",
     image: "/img/fleje-textil.jpg",
     summary:
-      "Fleje de hilos de poliéster con adhesivo hotmelt antideslizante, de aplicación manual con hebillas.",
+      "Fleje de hilos de poliéster con adhesivo hot melt antideslizante, de aplicación manual con hebillas.",
     specs: [
-      "Hilos de poliéster con adhesivo hotmelt antideslizante",
+      "Hilos de poliéster con adhesivo hot melt antideslizante",
       "Aplicación manual con hebillas",
       "Alta resistencia a la tensión y a la rotura",
       "Distintos colores y medidas",
@@ -610,30 +541,89 @@ const rawProducts: Product[] = [
     tags: [],
   },
   {
-    id: "flejadora",
-    name: "Flejadoras y enlazadores",
+    id: "flejadora-manual",
+    name: "Flejadora manual",
     category: "fleje",
-    family: "Herramientas de flejado",
+    family: "Accesorios",
     image: "/img/flejadora.jpg",
     summary:
-      "Herramientas tensoras y enlazadores para aplicar y cerrar el fleje de forma manual.",
+      "Herramienta robusta y de fácil uso para asegurar cargas de forma rápida y eficiente.",
     specs: [
-      "Tensado y cierre manual del fleje",
-      "Compatibles con fleje de PP y PET",
+      "Herramienta robusta y de fácil uso",
+      "Asegura las cargas de forma rápida y eficiente",
     ],
     tags: ["Uso manual"],
   },
   {
-    id: "portarrollos",
-    name: "Porta rollos de fleje",
+    id: "tensores",
+    name: "Tensores",
     category: "fleje",
-    family: "Herramientas de flejado",
+    family: "Accesorios",
+    image: "/img/flejadora.jpg",
+    summary:
+      "El tensor manual permite tensar y cortar flejes de PP, PET, hot melt y composite de 19 a 25 mm.",
+    specs: [
+      "Tensa y corta flejes de PP, PET, hot melt y composite",
+      "Para anchos de 19 a 25 mm",
+      "Asegura las cargas de forma rápida y eficiente",
+    ],
+    tags: ["Uso manual"],
+  },
+  {
+    id: "flejadora-fbtx19",
+    name: "Flejadora semiautomática FBTX-19",
+    category: "fleje",
+    family: "Accesorios",
+    image: "/img/flejadora-fbtx19.jpg",
+    summary:
+      "Flejadora manual con batería, de fiabilidad excepcional gracias a su diseño ergonómico y su construcción robusta.",
+    specs: [
+      "Flejadora manual con batería",
+      "Diseño ergonómico y construcción robusta",
+      "Para flejes de poliéster y polipropileno de 15 a 19 mm de ancho",
+    ],
+    tags: ["Uso manual"],
+  },
+  {
+    id: "mesa-flejadora",
+    name: "Mesa flejadora semiautomática",
+    category: "fleje",
+    family: "Accesorios",
+    image: "/img/flejadora.jpg",
+    summary:
+      "Mesa flejadora de alto rendimiento para flejes de polipropileno y poliéster.",
+    specs: [
+      "De alto rendimiento",
+      "Para flejes de polipropileno y poliéster de 5 a 15,5 mm de ancho",
+    ],
+    tags: ["Uso automático"],
+  },
+  {
+    id: "carros-devanadores",
+    name: "Carros devanadores",
+    category: "fleje",
+    family: "Accesorios",
     image: "/img/portarrollos.jpg",
     summary:
-      "Carro porta rollos con freno para desenrollar el fleje cómodamente en el puesto de trabajo.",
+      "Dispensador móvil de color azul para fleje, con cajetín en la parte superior para las fichas y las hebillas.",
     specs: [
-      "Carro con soporte para bobina de fleje",
-      "Facilita el desenrollado y transporte",
+      "Dispensador móvil de color azul",
+      "Cajetín en la parte superior para depositar las fichas y hebillas",
+    ],
+    tags: ["Uso manual"],
+  },
+  {
+    id: "enlazadores",
+    name: "Enlazadores",
+    category: "fleje",
+    family: "Accesorios",
+    image: "/img/grapas-fleje.jpg",
+    imageSize: "sm",
+    summary:
+      "Unión metálica para cerrar flejes de polipropileno y poliéster. En cajas de 4.000 unidades.",
+    specs: [
+      "Unión metálica para cerrar flejes de polipropileno y poliéster",
+      "En cajas de 4.000 unidades",
     ],
     tags: ["Uso manual"],
   },
@@ -641,29 +631,19 @@ const rawProducts: Product[] = [
     id: "hebillas",
     name: "Hebillas",
     category: "fleje",
-    family: "Herramientas de flejado",
+    family: "Accesorios",
     image: "/img/hebillas.jpg",
+    imageSize: "sm",
     summary:
-      "Hebillas metálicas para el cierre manual del fleje textil y de polipropileno.",
+      "Abrazadera de metal galvanizado para atar y sujetar flejes. En cajas de 1.000 unidades.",
     specs: [
-      "Cierre manual del fleje",
-      "Distintas medidas según ancho de fleje",
+      "Abrazadera de metal galvanizado para atar y sujetar flejes",
+      "En cajas de 1.000 unidades",
     ],
     tags: ["Uso manual"],
   },
-  {
-    id: "grapas-fleje",
-    name: "Grapas y precintos metálicos",
-    category: "fleje",
-    family: "Herramientas de flejado",
-    image: "/img/grapas-fleje.jpg",
-    summary:
-      "Grapas metálicas de unión para el cierre por engaste del fleje metálico y de plástico.",
-    specs: ["Cierre por engaste", "Distintas medidas según ancho de fleje"],
-    tags: ["Uso manual"],
-  },
 
-  /* ------------------------------------------------------------------- CARTÓN */
+  /* ------------------------------------------------------------------ CARTÓN */
   {
     id: "cajas-carton",
     name: "Cajas de cartón",
@@ -671,15 +651,15 @@ const rawProducts: Product[] = [
     family: "Cartón",
     image: "/img/cajas-carton.jpg",
     summary:
-      "Cajas de canal simple y doble, estándar o fabricadas a medida, incluidas cajas para palet.",
+      "Cajas de canal simple y doble, estándar o fabricadas a medida, incluidas cajas para palé.",
     specs: [
       "Canal simple y canal doble",
-      "Estándar y a medida · cajas para palet",
+      "Estándar y a medida · cajas para palé",
       "Color marrón y blanco",
       "Posibilidad de impresión",
       "Producto reciclable",
     ],
-    tags: ["A medida", "Impresión personalizada", "Ecológico"],
+    tags: ["A medida", "Impresión personalizada"],
   },
   {
     id: "cantoneras",
@@ -697,55 +677,94 @@ const rawProducts: Product[] = [
     ],
     tags: ["A medida"],
   },
-  {
-    id: "carton-ondulado",
-    name: "Bobinas de cartón ondulado",
-    category: "carton",
-    family: "Bobinas",
-    image: "/img/carton-ondulado.jpg",
-    summary:
-      "Material flexible, ligero y ecológico con excelente resistencia a los golpes para envolver y proteger.",
-    specs: [
-      "Diferentes medidas y gramajes",
-      "Embalaje y protección de sus productos",
-      "Excelente resistencia a los golpes",
-      "Material flexible, ligero y ecológico",
-    ],
-    tags: ["Ecológico", "A medida"],
-  },
-  {
-    id: "papel-kraft",
-    name: "Bobinas de papel Kraft",
-    category: "carton",
-    family: "Bobinas",
-    image: "/img/papel-kraft.jpg",
-    summary:
-      "Papel Kraft de alta resistencia para embalar y como material de relleno y protección de mercancías.",
-    specs: [
-      "Bobina de papel Kraft para embalar sus envíos",
-      "Uso como material de relleno para protección de mercancías",
-      "Alta resistencia",
-      "Diferentes gramajes y medidas",
-      "Producto ecológico",
-    ],
-    tags: ["Ecológico", "A medida"],
-  },
 
-  /* ------------------------------------------------------------------- PALETS */
+  /* ------------------------------------------------------------------- PALÉS */
   {
-    id: "palets",
-    name: "Palets de madera",
-    category: "palets",
-    family: "Palets",
+    id: "pales-polietileno",
+    name: "Palés de polietileno de alta densidad",
+    category: "pales",
+    family: "Palés",
+    image: "/img/palet-polietileno.jpg",
+    summary:
+      "Palés fabricados en polietileno de alta densidad, muy resistentes y válidos para la exportación.",
+    specs: [
+      "Fabricados en polietileno de alta densidad",
+      "Muy resistentes",
+      "Válidos para la exportación",
+      "Medidas 800 × 1200 mm",
+    ],
+    tags: [],
+  },
+  {
+    id: "pales-segundo-uso",
+    name: "Palés de 2.º uso",
+    category: "pales",
+    family: "Palés",
     image: "/img/palets.jpg",
     summary:
-      "Palets de madera en los formatos paletina, ligero, semifuerte y europeo para expedición y almacenaje.",
+      "Palés de segundo uso: más manejables y económicos que el europalé, en las medidas más habituales.",
     specs: [
-      "Cuatro formatos disponibles",
-      "Para expedición y almacenaje de mercancías",
+      "Palé americano 800 × 600 mm",
+      "800 × 1200 mm ligero",
+      "800 × 1200 mm fuerte (hasta 750 kg)",
+      "Resistente, más manejable y económico que el europalé",
     ],
-    variants: ["Paletina", "Ligero", "Semifuerte", "Europeo"],
+    variants: [
+      "Americano 800 × 600",
+      "800 × 1200 ligero",
+      "800 × 1200 fuerte",
+    ],
     tags: [],
+  },
+
+  /* -------------------------------------------------------------- MAQUINARIA */
+  {
+    id: "envolvedora-ecoplat",
+    name: "Envolvedora de mesa rotativa Ecoplat Plus",
+    category: "maquinaria",
+    family: "Envolvedoras",
+    image: "/img/envolvedora-ecoplat.jpg",
+    summary:
+      "Envolvedora de mesa rotativa para paletizar con film estirable, disponible en versión Base y FRD.",
+    specs: [
+      "Mesa rotativa para envolver palés con film estirable",
+      "Versión Base con panel de pulsadores electromecánicos",
+      "Versión FRD con pantalla y selector de parámetros JOG",
+    ],
+    variants: ["Base", "FRD"],
+    tags: ["Uso automático"],
+  },
+  {
+    id: "envolvedora-masterwrap",
+    name: "Envolvedora de brazo giratorio Masterwrap HD Plus XL",
+    category: "maquinaria",
+    family: "Envolvedoras",
+    image: "/img/envolvedora-masterwrap.jpg",
+    summary:
+      "Envolvedora de brazo giratorio para cargas pesadas o inestables: el palé permanece fijo y gira el brazo.",
+    specs: [
+      "Brazo giratorio: el palé permanece fijo",
+      "Pantalla gráfica en color de 3,5 pulgadas y selector de parámetros JOG",
+      "6 recetas programables",
+      "Ciclo de subida y bajada, o sólo subida o sólo bajada",
+    ],
+    tags: ["Uso automático"],
+  },
+  {
+    id: "envolvedora-robot",
+    name: "Robot envolvedor Master Plus",
+    category: "maquinaria",
+    family: "Envolvedoras",
+    image: "/img/envolvedora-robot.jpg",
+    summary:
+      "Robot autopropulsado para embalaje con film extensible, sin límite de tamaño ni de peso del palé.",
+    specs: [
+      "Robot autopropulsado para embalaje con film extensible",
+      "Panel de control con JOG y pantalla gráfica en color",
+      "6 programas memorizables",
+      "Regulación de la velocidad de rotación",
+    ],
+    tags: ["Uso automático"],
   },
 ];
 

@@ -1,18 +1,15 @@
-import { ActionIcon, Badge, Box, Card, Group, Image, Stack, Text, Tooltip } from '@mantine/core';
-import { IconCheck, IconPlus } from '@tabler/icons-react';
+import { Badge, Box, Card, Group, Image, Stack, Text } from '@mantine/core';
 import { categoryById, type Product } from '../data/catalog';
 import classes from './ProductCard.module.css';
 
 interface Props {
   product: Product;
-  selected: boolean;
   /** En la vista agrupada la categoría ya la da el encabezado de sección. */
   showCategory?: boolean;
   onOpen: (p: Product) => void;
-  onToggle: (id: string) => void;
 }
 
-export function ProductCard({ product, selected, showCategory, onOpen, onToggle }: Props) {
+export function ProductCard({ product, showCategory, onOpen }: Props) {
   const category = categoryById(product.category);
 
   return (
@@ -39,32 +36,13 @@ export function ProductCard({ product, selected, showCategory, onOpen, onToggle 
           h={170}
           loading="lazy"
           className={classes.image}
+          data-size={product.imageSize}
           onLoad={(e) => e.currentTarget.setAttribute('data-loaded', '')}
           // Si la imagen ya estaba en caché, `onLoad` puede no llegar a dispararse.
           ref={(el) => {
             if (el?.complete) el.setAttribute('data-loaded', '');
           }}
         />
-        <Tooltip
-          label={selected ? 'Quitar de la solicitud' : 'Añadir a la solicitud'}
-          position="left"
-          withArrow
-        >
-          <ActionIcon
-            className={classes.add}
-            variant={selected ? 'filled' : 'default'}
-            color={selected ? 'brand' : undefined}
-            size="lg"
-            radius="xl"
-            aria-label={selected ? 'Quitar de la solicitud' : 'Añadir a la solicitud'}
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle(product.id);
-            }}
-          >
-            {selected ? <IconCheck size={18} /> : <IconPlus size={18} />}
-          </ActionIcon>
-        </Tooltip>
       </Card.Section>
 
       <Stack gap={6} mt="md" style={{ flex: 1 }}>

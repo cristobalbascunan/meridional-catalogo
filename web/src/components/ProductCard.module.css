@@ -32,21 +32,19 @@
   padding: var(--mantine-spacing-md);
 }
 
-.add {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  transition:
-    transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    background-color 160ms ease;
+/*
+ * Piezas pequenas (hebillas, fichas, enlazadores): fotografiadas de cerca se
+ * veian desproporcionadas junto a una bobina. Se les reserva menos ancho para
+ * que guarden relacion con el resto del catalogo.
+ */
+.image[data-size='sm'] {
+  padding: var(--mantine-spacing-md) 25%;
 }
 
-.add:hover {
-  transform: scale(1.12);
-}
-
-.add:active {
-  transform: scale(0.94);
+@media (max-width: 48em) {
+  .image[data-size='sm'] {
+    padding: var(--mantine-spacing-md) 30%;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

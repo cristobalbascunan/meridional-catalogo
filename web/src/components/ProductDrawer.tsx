@@ -13,26 +13,27 @@ import {
   Title,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconBrandWhatsapp, IconCheck, IconCircleCheck, IconPlus } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconCircleCheck, IconMail } from '@tabler/icons-react';
 import { COMPANY, categoryById, type Product } from '../data/catalog';
 
 interface Props {
   product: Product | null;
   opened: boolean;
-  selected: boolean;
   onClose: () => void;
-  onToggle: (id: string) => void;
 }
 
-export function ProductDrawer({ product, opened, selected, onClose, onToggle }: Props) {
+export function ProductDrawer({ product, opened, onClose }: Props) {
   const isMobile = useMediaQuery('(max-width: 48em)');
   const category = product ? categoryById(product.category) : null;
 
-  const whatsapp = product
-    ? `https://wa.me/${COMPANY.phoneRaw}?text=${encodeURIComponent(
-        `Hola, me gustaría recibir información sobre "${product.name}" del catálogo ${COMPANY.catalogYear}.`,
-      )}`
-    : '#';
+  const consulta = product
+    ? `Hola, me gustaría recibir información sobre "${product.name}" del catálogo ${COMPANY.catalogYear}.`
+    : '';
+
+  const whatsapp = `https://wa.me/${COMPANY.phoneRaw}?text=${encodeURIComponent(consulta)}`;
+  const mailto = `mailto:${COMPANY.email}?subject=${encodeURIComponent(
+    product ? `Consulta sobre ${product.name}` : 'Consulta',
+  )}&body=${encodeURIComponent(consulta)}`;
 
   return (
     <Drawer
@@ -52,7 +53,12 @@ export function ProductDrawer({ product, opened, selected, onClose, onToggle }: 
       {product && (
         <Stack gap="lg" pb="xl">
           <Box bg="white" px="lg" py="md">
-            <Image src={product.image} alt={product.name} fit="contain" h={230} />
+            <Image
+              src={product.image}
+              alt={product.name}
+              fit="contain"
+              h={product.imageSize === 'sm' ? 160 : 230}
+            />
           </Box>
 
           <Stack gap="sm" px="lg">
@@ -114,15 +120,6 @@ export function ProductDrawer({ product, opened, selected, onClose, onToggle }: 
             <Group grow wrap="nowrap">
               <Button
                 size="md"
-                variant={selected ? 'light' : 'filled'}
-                leftSection={selected ? <IconCheck size={18} /> : <IconPlus size={18} />}
-                onClick={() => onToggle(product.id)}
-              >
-                {selected ? 'En la solicitud' : 'Añadir'}
-              </Button>
-              <Button
-                size="md"
-                variant="default"
                 component="a"
                 href={whatsapp}
                 target="_blank"
@@ -130,6 +127,15 @@ export function ProductDrawer({ product, opened, selected, onClose, onToggle }: 
                 leftSection={<IconBrandWhatsapp size={18} />}
               >
                 WhatsApp
+              </Button>
+              <Button
+                size="md"
+                variant="default"
+                component="a"
+                href={mailto}
+                leftSection={<IconMail size={18} />}
+              >
+                Email
               </Button>
             </Group>
 

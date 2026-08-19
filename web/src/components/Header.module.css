@@ -63,19 +63,19 @@
   }
 }
 
-.quoteFull {
+.waFull {
   display: inline-flex;
 }
 
-.quoteIcon {
+.waIcon {
   display: none;
 }
 
 @media (max-width: 36em) {
-  .quoteFull {
+  .waFull {
     display: none;
   }
-  .quoteIcon {
+  .waIcon {
     display: inline-flex;
   }
 }

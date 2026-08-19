@@ -35,8 +35,9 @@ export function Hero({ query, onQuery, onActive }: Props) {
           </Title>
 
           <Text size="lg" className={classes.lead}>
-            {products.length} referencias en film estirable, precintos, fleje, cartón y palets.
-            Consulta la ficha de cada producto y prepara tu solicitud en un minuto.
+            {products.length} referencias en precinto, film estirable, burbuja, foam, fleje,
+            cartón, palés y maquinaria. Consulta la ficha de cada producto y escríbenos
+            por WhatsApp o email.
           </Text>
 
           <TextInput
