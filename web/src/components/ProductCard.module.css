@@ -16,6 +16,13 @@
   border-color: var(--mantine-color-brand-4);
 }
 
+/* La tarjeta es un `role="button"`: al llegar con el tabulador tiene que verse
+   el foco, y el desplazamiento del hover por sí solo no basta. */
+.card:focus-visible {
+  outline: 2px solid var(--mantine-color-brand-6);
+  outline-offset: 2px;
+}
+
 .card:active {
   transform: translateY(-1px);
   transition-duration: 80ms;
@@ -45,6 +52,29 @@
   .image[data-size='sm'] {
     padding: var(--mantine-spacing-md) 30%;
   }
+}
+
+/* Flecha de «abrir ficha»: apagada en reposo, marcada al pasar por encima. */
+.go {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: var(--mantine-color-dimmed);
+  background: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    translate 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .go,
+.card:focus-visible .go {
+  background: var(--mantine-color-brand-6);
+  color: #fff;
+  translate: 3px 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {

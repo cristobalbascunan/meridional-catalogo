@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Affix,
   Badge,
@@ -7,11 +7,13 @@ import {
   Chip,
   Container,
   Group,
+  Pill,
   SimpleGrid,
   Stack,
   Text,
   Title,
   Transition,
+  VisuallyHidden,
   rem,
 } from '@mantine/core';
 import { useWindowScroll } from '@mantine/hooks';
@@ -20,11 +22,13 @@ import { useViewTransition } from './hooks/useViewTransition';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Footer } from './components/Footer';
+import { ContactCta } from './components/ContactCta';
 import { ProductCard } from './components/ProductCard';
 import { ProductDrawer } from './components/ProductDrawer';
 import {
   TAGS,
   categories,
+  categoryById,
   products,
   type CategoryId,
   type Product,
@@ -44,6 +48,13 @@ const haystack = (p: Product) =>
   norm(
     [p.name, p.family, p.summary, ...p.specs, ...(p.variants ?? []), ...p.tags].join(' '),
   );
+
+/** Ficha enlazada en la URL, del tipo `#p/precinto-impreso`. */
+const productFromHash = (): Product | null => {
+  const m = /^#p\/(.+)$/.exec(window.location.hash);
+  if (!m) return null;
+  return products.find((p) => p.id === decodeURIComponent(m[1])) ?? null;
+};
 
 export default function App() {
   const [query, setQuery] = useState('');
@@ -89,12 +100,69 @@ export default function App() {
   // transición por cada pulsación se vería a trompicones.
   const changeCategory = (v: CategoryId | 'all') => startTransition(() => setActive(v));
 
+  /**
+   * Al empezar a buscar hay que ver los resultados. El buscador principal está en
+   * la portada y la rejilla queda por debajo del pliegue: sin esto se escribe y
+   * aparentemente no pasa nada. Sólo se baja si el catálogo no está ya a la vista,
+   * para no dar tirones a quien busca desde la cabecera con los resultados delante.
+   */
+  const handleQuery = (v: string) => {
+    const wasEmpty = query.trim() === '';
+    setQuery(v);
+    if (!wasEmpty || v.trim() === '') return;
+    requestAnimationFrame(() => {
+      const el = document.getElementById('catalogo');
+      if (el && el.getBoundingClientRect().top > window.innerHeight * 0.4) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  };
+
   const reset = () =>
     startTransition(() => {
       setQuery('');
       setActive('all');
       setTags([]);
     });
+
+  /* ------------------------------------------------- Ficha enlazable por URL */
+
+  // Abrir una ficha añade una entrada al historial: el botón «atrás» del móvil
+  // la cierra, y el enlace `#p/<id>` se le puede pasar a un cliente tal cual.
+  // `pushed` distingue esa entrada nuestra de la de quien llega directamente
+  // desde un enlace compartido: a ese, un `history.back()` lo sacaría de la web.
+  const pushed = useRef(false);
+
+  const openDetail = useCallback((p: Product) => {
+    setDetail(p);
+    window.history.pushState(null, '', `#p/${p.id}`);
+    pushed.current = true;
+  }, []);
+
+  const closeDetail = useCallback(() => {
+    if (pushed.current) {
+      pushed.current = false;
+      window.history.back();
+      return;
+    }
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    setDetail(null);
+  }, []);
+
+  useEffect(() => {
+    const sync = () => {
+      const p = productFromHash();
+      if (!p) pushed.current = false;
+      setDetail(p);
+    };
+    sync();
+    window.addEventListener('popstate', sync);
+    window.addEventListener('hashchange', sync);
+    return () => {
+      window.removeEventListener('popstate', sync);
+      window.removeEventListener('hashchange', sync);
+    };
+  }, []);
 
   const grid = (list: Product[], showCategory = false) => (
     <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 4 }} spacing="md" verticalSpacing="md">
@@ -103,7 +171,7 @@ export default function App() {
           key={p.id}
           product={p}
           showCategory={showCategory}
-          onOpen={setDetail}
+          onOpen={openDetail}
         />
       ))}
     </SimpleGrid>
@@ -111,60 +179,104 @@ export default function App() {
 
   return (
     <>
+      <a href="#catalogo" className={classes.skip}>
+        Saltar al catálogo
+      </a>
+
       <Header
         query={query}
-        onQuery={setQuery}
+        onQuery={handleQuery}
         active={active}
         onActive={changeCategory}
       />
 
-      <Hero query={query} onQuery={setQuery} onActive={changeCategory} />
+      <Hero query={query} onQuery={handleQuery} onActive={changeCategory} />
 
-      <Container size="xl" py="xl" id="catalogo">
+      <Container size="xl" py="xl" id="catalogo" component="main" tabIndex={-1}>
         <Stack gap="xl">
-          {/* Filtros rápidos por característica */}
-          <Group justify="space-between" align="flex-end" gap="md">
-            <Box>
-              <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={8}>
-                Filtrar por característica
-              </Text>
-              <Chip.Group
-                multiple
-                value={tags}
-                onChange={(v) => startTransition(() => setTags(v as Tag[]))}
-              >
-                <Group gap={8} className={classes.filterRow} wrap="nowrap">
-                  {TAGS.map((t) => (
-                    <Chip
-                      key={t}
-                      value={t}
-                      variant="outline"
-                      radius="xl"
-                      size="sm"
-                      disabled={tagCounts[t] === 0 && !tags.includes(t)}
-                    >
-                      {t}{' '}
-                      <Text span c="dimmed" fz="xs">
-                        {tagCounts[t]}
-                      </Text>
-                    </Chip>
-                  ))}
-                </Group>
-              </Chip.Group>
-            </Box>
+          {/* Barra de filtros */}
+          <Box className={classes.toolbar}>
+            <Group justify="space-between" align="flex-end" gap="md">
+              <Box>
+                <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={8}>
+                  Filtrar por característica
+                </Text>
+                <Chip.Group
+                  multiple
+                  value={tags}
+                  onChange={(v) => startTransition(() => setTags(v as Tag[]))}
+                >
+                  <Group gap={8} className={classes.filterRow} wrap="nowrap">
+                    {TAGS.map((t) => (
+                      <Chip
+                        key={t}
+                        value={t}
+                        variant="outline"
+                        radius="xl"
+                        size="sm"
+                        disabled={tagCounts[t] === 0 && !tags.includes(t)}
+                      >
+                        {t}{' '}
+                        <Text span c="dimmed" fz="xs">
+                          {tagCounts[t]}
+                        </Text>
+                      </Chip>
+                    ))}
+                  </Group>
+                </Chip.Group>
+              </Box>
 
+              {isFiltering && (
+                <Button
+                  variant="subtle"
+                  color="gray"
+                  size="compact-sm"
+                  leftSection={<IconFilterOff size={16} />}
+                  onClick={reset}
+                >
+                  Quitar filtros
+                </Button>
+              )}
+            </Group>
+
+            {/* Resumen de lo aplicado: se ve de un vistazo por qué la lista está
+                recortada, y cada criterio se puede quitar por separado. */}
             {isFiltering && (
-              <Button
-                variant="subtle"
-                color="gray"
-                size="compact-sm"
-                leftSection={<IconFilterOff size={16} />}
-                onClick={reset}
-              >
-                Quitar filtros
-              </Button>
+              <Group gap={6} mt="sm">
+                <Text size="xs" c="dimmed" fw={600}>
+                  Filtros activos:
+                </Text>
+                {active !== 'all' && (
+                  <Pill withRemoveButton onRemove={() => changeCategory('all')}>
+                    {categoryById(active).name}
+                  </Pill>
+                )}
+                {query.trim() !== '' && (
+                  <Pill withRemoveButton onRemove={() => setQuery('')}>
+                    «{query.trim()}»
+                  </Pill>
+                )}
+                {tags.map((t) => (
+                  <Pill
+                    key={t}
+                    withRemoveButton
+                    onRemove={() =>
+                      startTransition(() => setTags((prev) => prev.filter((x) => x !== t)))
+                    }
+                  >
+                    {t}
+                  </Pill>
+                ))}
+              </Group>
             )}
-          </Group>
+          </Box>
+
+          {/* Recuento anunciado a los lectores de pantalla al cambiar los filtros. */}
+          <VisuallyHidden aria-live="polite">
+            {isFiltering
+              ? `${filtered.length} productos encontrados`
+              : `${products.length} productos en el catálogo`}
+          </VisuallyHidden>
 
           {/* `catalogo` es el nombre de transición: al cambiar de categoría o de
               filtro sólo se funde esta zona, no la cabecera ni el hero. */}
@@ -202,7 +314,7 @@ export default function App() {
               {categories.map((c) => {
                 const list = products.filter((p) => p.category === c.id);
                 return (
-                  <Stack key={c.id} gap="md" id={c.id}>
+                  <Stack key={c.id} gap="md" id={c.id} component="section">
                     <Box>
                       <Group gap="xs" align="center">
                         <Title order={2} fz="1.6rem">
@@ -225,13 +337,11 @@ export default function App() {
         </Stack>
       </Container>
 
+      <ContactCta />
+
       <Footer onActive={changeCategory} />
 
-      <ProductDrawer
-        product={detail}
-        opened={detail !== null}
-        onClose={() => setDetail(null)}
-      />
+      <ProductDrawer product={detail} opened={detail !== null} onClose={closeDetail} />
 
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
         <Transition

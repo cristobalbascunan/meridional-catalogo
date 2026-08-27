@@ -22,7 +22,7 @@ interface Props {
 
 export function Footer({ onActive }: Props) {
   return (
-    <Box component="footer" className={classes.footer} id="contacto">
+    <Box component="footer" className={classes.footer}>
       <Container size="xl" py="xl">
         <Grid gap="xl">
           <Grid.Col span={{ base: 12, sm: 6, md: 5 }}>

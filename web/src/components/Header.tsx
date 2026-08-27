@@ -13,7 +13,8 @@ import {
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core';
-import { IconBrandWhatsapp, IconMoon, IconSearch, IconSun } from '@tabler/icons-react';
+import { useHotkeys, useMediaQuery, useWindowScroll } from '@mantine/hooks';
+import { IconMoon, IconPhone, IconSearch, IconSun } from '@tabler/icons-react';
 import { COMPANY, asset, categories, type CategoryId } from '../data/catalog';
 import classes from './Header.module.css';
 
@@ -28,19 +29,32 @@ export function Header({ query, onQuery, active, onActive }: Props) {
   const { setColorScheme } = useMantineColorScheme();
   const scheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const [searchOpen, setSearchOpen] = useState(false);
+  const [scroll] = useWindowScroll();
 
   // Con una búsqueda activa el campo permanece visible aunque no se haya desplegado
   // a mano, para que se vea qué se está filtrando.
   const showSearchRow = searchOpen || query !== '';
 
-  const whatsapp = `https://wa.me/${COMPANY.phoneRaw}`;
+  // El campo ancho sólo existe a partir de 62em; por debajo se usa el desplegable.
+  const wideSearch = useMediaQuery('(min-width: 62em)', true);
 
-  // El campo se monta una sola vez (se muestra y oculta por CSS), así que hay que
-  // enfocarlo a mano al desplegarlo: `autoFocus` solo actuaría en el montaje.
+  const deskRef = useRef<HTMLInputElement>(null);
+  // El campo del desplegable se monta una sola vez (se muestra y oculta por CSS),
+  // así que hay que enfocarlo a mano al abrirlo: `autoFocus` sólo actúa al montar.
   const searchRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
+
+  /** Atajos de teclado habituales en un buscador: «/» y Ctrl/Cmd+K. */
+  const focusSearch = () => {
+    if (wideSearch) deskRef.current?.focus();
+    else setSearchOpen(true);
+  };
+  useHotkeys([
+    ['/', focusSearch],
+    ['mod+K', focusSearch],
+  ]);
 
   const toggleSearch = () => {
     if (showSearchRow) {
@@ -56,8 +70,27 @@ export function Header({ query, onQuery, active, onActive }: Props) {
     ...categories.map((c) => ({ id: c.id, label: c.name })),
   ];
 
+  /** El campo de búsqueda es el mismo arriba y en el desplegable. */
+  const searchInput = (ref: React.RefObject<HTMLInputElement | null>, className?: string) => (
+    <TextInput
+      className={className}
+      ref={ref}
+      placeholder="Buscar producto, material o uso…"
+      value={query}
+      onChange={(e) => onQuery(e.currentTarget.value)}
+      leftSection={<IconSearch size={16} />}
+      rightSection={
+        query ? (
+          <CloseButton size="sm" onClick={() => onQuery('')} aria-label="Limpiar búsqueda" />
+        ) : null
+      }
+      radius="xl"
+      aria-label="Buscar en el catálogo"
+    />
+  );
+
   return (
-    <Box component="header" className={classes.header}>
+    <Box component="header" className={classes.header} data-scrolled={scroll.y > 8 || undefined}>
       <Container size="xl" className={classes.top}>
         <Group justify="space-between" wrap="nowrap" gap="sm">
           <a href="#inicio" className={classes.brand} aria-label="Meridional Plastic — inicio">
@@ -65,23 +98,12 @@ export function Header({ query, onQuery, active, onActive }: Props) {
               src={asset('img/logo.png')}
               alt="Meridional Plastic"
               className={classes.logo}
+              width={140}
+              height={34}
             />
           </a>
 
-          <TextInput
-            className={classes.search}
-            placeholder="Buscar producto, material o uso…"
-            value={query}
-            onChange={(e) => onQuery(e.currentTarget.value)}
-            leftSection={<IconSearch size={16} />}
-            rightSection={
-              query ? (
-                <CloseButton size="sm" onClick={() => onQuery('')} aria-label="Limpiar búsqueda" />
-              ) : null
-            }
-            radius="xl"
-            aria-label="Buscar en el catálogo"
-          />
+          {searchInput(deskRef, classes.search)}
 
           <Group gap="xs" wrap="nowrap">
             <ActionIcon
@@ -89,7 +111,7 @@ export function Header({ query, onQuery, active, onActive }: Props) {
               variant={query ? 'filled' : 'default'}
               size="lg"
               radius="xl"
-              aria-label="Buscar en el catálogo"
+              aria-label={showSearchRow ? 'Cerrar el buscador' : 'Abrir el buscador'}
               aria-expanded={showSearchRow}
               onClick={toggleSearch}
             >
@@ -109,52 +131,33 @@ export function Header({ query, onQuery, active, onActive }: Props) {
             </Tooltip>
 
             <Button
-              className={classes.waFull}
+              className={classes.phoneFull}
               component="a"
-              href={whatsapp}
-              target="_blank"
-              rel="noreferrer"
-              color="teal"
-              leftSection={<IconBrandWhatsapp size={18} />}
+              href={`tel:+${COMPANY.phoneRaw}`}
+              leftSection={<IconPhone size={18} />}
             >
-              WhatsApp
+              {COMPANY.phone}
             </Button>
             <ActionIcon
-              className={classes.waIcon}
+              className={classes.phoneIcon}
               component="a"
-              href={whatsapp}
-              target="_blank"
-              rel="noreferrer"
-              color="teal"
+              href={`tel:+${COMPANY.phoneRaw}`}
               variant="filled"
               size="lg"
               radius="xl"
-              aria-label="Contactar por WhatsApp"
+              aria-label={`Llamar al ${COMPANY.phone}`}
             >
-              <IconBrandWhatsapp size={18} />
+              <IconPhone size={18} />
             </ActionIcon>
           </Group>
         </Group>
 
         <Box className={classes.searchRow} data-open={showSearchRow || undefined}>
-          <TextInput
-            placeholder="Buscar producto, material o uso…"
-            value={query}
-            onChange={(e) => onQuery(e.currentTarget.value)}
-            leftSection={<IconSearch size={16} />}
-            rightSection={
-              query ? (
-                <CloseButton size="sm" onClick={() => onQuery('')} aria-label="Limpiar búsqueda" />
-              ) : null
-            }
-            radius="xl"
-            ref={searchRef}
-            aria-label="Buscar en el catálogo"
-          />
+          {searchInput(searchRef)}
         </Box>
       </Container>
 
-      <Box className={classes.navWrap}>
+      <Box component="nav" className={classes.navWrap} aria-label="Categorías del catálogo">
         <Container size="xl" px={0}>
           <ScrollArea type="never" offsetScrollbars={false}>
             <Group gap={8} wrap="nowrap" className={classes.chips}>

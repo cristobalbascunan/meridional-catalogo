@@ -5,29 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
     <title>Catálogo 2026 · Meridional Plastic — Envase y embalaje</title>
     <meta
       name="description"
       content="Catálogo de productos para envase y embalaje de Meridional Plastic, S.L.: precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria de envolver."
     />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Meridional Plastic, S.L." />
     <meta name="theme-color" content="#0d6dff" />
+
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Meridional Plastic" />
     <meta property="og:title" content="Catálogo 2026 · Meridional Plastic" />
     <meta
       property="og:description"
       content="Productos para envase y embalaje: precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria."
     />
+    <!--
+      Ojo: al compilar con base relativa esta ruta queda como `./img/…`. Las redes
+      sociales necesitan una URL absoluta para poder descargar la imagen, así que
+      cuando el sitio tenga dominio definitivo hay que ponerla completa aquí.
+    -->
     <meta property="og:image" content="/img/hero-tapes.jpg" />
+    <meta property="og:image:alt" content="Bobinas de precinto de Meridional Plastic" />
     <meta property="og:locale" content="es_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Fondo de la portada: es el elemento más grande de la primera pantalla y
+         va referenciado desde el CSS, así que sin esto se pide tarde. -->
+    <link rel="preload" as="image" href="/img/hero-tapes.jpg" fetchpriority="high" />
+
+    <!-- Datos de la empresa para buscadores. Deben coincidir con COMPANY en
+         src/data/catalog.ts. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Meridional Plastic, S.L.",
+        "description": "Distribución de material de envase y embalaje para industria y comercio.",
+        "email": "info@meridionalplastic.com",
+        "telephone": "+34976158711",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Pol. Ind. Malpica Alfindén, Calle F, Nave 14",
+          "postalCode": "50171",
+          "addressLocality": "La Puebla de Alfindén",
+          "addressRegion": "Zaragoza",
+          "addressCountry": "ES"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p style="font-family: sans-serif; padding: 2rem">
+        Este catálogo necesita JavaScript. Si no puedes activarlo, escríbenos a
+        <a href="mailto:info@meridionalplastic.com">info@meridionalplastic.com</a> o llama al
+        <a href="tel:+34976158711">976 158 711</a> y te lo enviamos en PDF.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

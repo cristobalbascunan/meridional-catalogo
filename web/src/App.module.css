@@ -1,3 +1,35 @@
+/*
+ * Enlace de salto: invisible hasta que se llega a él con el tabulador. Evita
+ * tener que recorrer logotipo, buscador y todas las categorías con el teclado antes
+ * de llegar a los productos.
+ */
+.skip {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 500;
+  padding: 10px 18px;
+  border-radius: var(--mantine-radius-xl);
+  background: var(--mantine-color-brand-6);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 150ms ease;
+}
+
+.skip:focus-visible {
+  top: 12px;
+}
+
+/* Barra de filtros: una tarjeta ligera que la separa de la rejilla en lugar de
+   dejar los chips flotando sobre el fondo. */
+.toolbar {
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
+  border: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
+  border-radius: var(--mantine-radius-lg);
+  padding: var(--mantine-spacing-md);
+}
+
 /* Zona que se funde al cambiar de categoría o de filtro. */
 .results {
   view-transition-name: catalogo;

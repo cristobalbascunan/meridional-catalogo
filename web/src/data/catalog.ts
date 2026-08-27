@@ -62,7 +62,7 @@ export const COMPANY = {
   city: "50171 La Puebla de Alfindén, Zaragoza, España",
   email: "info@meridionalplastic.com",
   phone: "976 158 711",
-  /** Mismo número sin separadores, para los enlaces tel: y wa.me */
+  /** Mismo número sin separadores, para los enlaces tel: */
   phoneRaw: "34976158711",
   catalogYear: 2026,
 };

@@ -2,6 +2,7 @@ import {
   Badge,
   Box,
   Button,
+  CopyButton,
   Divider,
   Drawer,
   Group,
@@ -13,8 +14,15 @@ import {
   Title,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconBrandWhatsapp, IconCircleCheck, IconMail } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconCircleCheck,
+  IconLink,
+  IconMail,
+  IconPhone,
+} from '@tabler/icons-react';
 import { COMPANY, categoryById, type Product } from '../data/catalog';
+import classes from './ProductDrawer.module.css';
 
 interface Props {
   product: Product | null;
@@ -27,13 +35,18 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
   const category = product ? categoryById(product.category) : null;
 
   const consulta = product
-    ? `Hola, me gustaría recibir información sobre "${product.name}" del catálogo ${COMPANY.catalogYear}.`
+    ? `Hola, me gustaría recibir información y presupuesto sobre "${product.name}" del catálogo ${COMPANY.catalogYear}.`
     : '';
 
-  const whatsapp = `https://wa.me/${COMPANY.phoneRaw}?text=${encodeURIComponent(consulta)}`;
   const mailto = `mailto:${COMPANY.email}?subject=${encodeURIComponent(
     product ? `Consulta sobre ${product.name}` : 'Consulta',
   )}&body=${encodeURIComponent(consulta)}`;
+
+  // Enlace directo a esta ficha, para poder pasársela a un cliente o a un compañero.
+  const permalink =
+    product && typeof window !== 'undefined'
+      ? `${window.location.origin}${window.location.pathname}#p/${product.id}`
+      : '';
 
   return (
     <Drawer
@@ -51,99 +64,122 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
       styles={{ header: { paddingInline: 'var(--mantine-spacing-lg)' } }}
     >
       {product && (
-        <Stack gap="lg" pb="xl">
-          <Box bg="white" px="lg" py="md">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fit="contain"
-              h={product.imageSize === 'sm' ? 160 : 230}
-            />
-          </Box>
+        <>
+          <Stack gap="lg" pb="md">
+            <Box className={classes.media} px="lg" py="md">
+              <Image
+                src={product.image}
+                alt={product.name}
+                fit="contain"
+                h={product.imageSize === 'sm' ? 160 : 230}
+              />
+            </Box>
 
-          <Stack gap="sm" px="lg">
-            <div>
-              <Text size="xs" fw={700} c="brand" tt="uppercase">
-                {product.family}
-              </Text>
-              <Title order={2} fz="1.6rem" mt={4}>
-                {product.name}
-              </Title>
-            </div>
+            <Stack gap="sm" px="lg">
+              <div>
+                <Text size="xs" fw={700} c="brand" tt="uppercase">
+                  {product.family}
+                </Text>
+                <Title order={2} fz="1.6rem" mt={4}>
+                  {product.name}
+                </Title>
+              </div>
 
-            <Text c="dimmed">{product.summary}</Text>
+              <Text c="dimmed">{product.summary}</Text>
 
-            {product.tags.length > 0 && (
-              <Group gap={6}>
-                {product.tags.map((t) => (
-                  <Badge key={t} variant="light" color="brand">
-                    {t}
-                  </Badge>
-                ))}
-              </Group>
-            )}
-
-            <Divider my="xs" />
-
-            <Text fw={700}>Características</Text>
-            <List
-              spacing={8}
-              icon={
-                <ThemeIcon color="brand" size={20} radius="xl">
-                  <IconCircleCheck size={14} />
-                </ThemeIcon>
-              }
-            >
-              {product.specs.map((s) => (
-                <List.Item key={s}>
-                  <Text size="sm">{s}</Text>
-                </List.Item>
-              ))}
-            </List>
-
-            {product.variants && product.variants.length > 0 && (
-              <>
-                <Divider my="xs" />
-                <Text fw={700}>Referencias disponibles</Text>
-                <Group gap={8}>
-                  {product.variants.map((v) => (
-                    <Badge key={v} variant="outline" color="gray" size="lg">
-                      {v}
+              {product.tags.length > 0 && (
+                <Group gap={6}>
+                  {product.tags.map((t) => (
+                    <Badge key={t} variant="light" color="brand">
+                      {t}
                     </Badge>
                   ))}
                 </Group>
-              </>
-            )}
+              )}
 
-            <Divider my="xs" />
+              <Divider my="xs" />
 
-            <Group grow wrap="nowrap">
+              <Text fw={700}>Características</Text>
+              <List
+                spacing={8}
+                icon={
+                  <ThemeIcon color="brand" size={20} radius="xl">
+                    <IconCircleCheck size={14} />
+                  </ThemeIcon>
+                }
+              >
+                {product.specs.map((s) => (
+                  <List.Item key={s}>
+                    <Text size="sm">{s}</Text>
+                  </List.Item>
+                ))}
+              </List>
+
+              {product.variants && product.variants.length > 0 && (
+                <>
+                  <Divider my="xs" />
+                  <Text fw={700}>Referencias disponibles</Text>
+                  <Group gap={8}>
+                    {product.variants.map((v) => (
+                      <Badge key={v} variant="outline" color="gray" size="lg">
+                        {v}
+                      </Badge>
+                    ))}
+                  </Group>
+                </>
+              )}
+
+              <Divider my="xs" />
+
+              <Text size="xs" c="dimmed">
+                Todos los productos disponen de características técnicas y certificados CE.
+                Referencia: <Text span ff="monospace">{product.id}</Text>
+              </Text>
+            </Stack>
+          </Stack>
+
+          {/*
+            Las acciones se quedan fijas al pie: en fichas con muchas
+            características quedaban fuera de pantalla y había que bajar hasta el
+            final para encontrar cómo pedir presupuesto.
+          */}
+          <Box className={classes.actions}>
+            <Group grow wrap="nowrap" gap="xs">
               <Button
                 size="md"
                 component="a"
-                href={whatsapp}
-                target="_blank"
-                rel="noreferrer"
-                leftSection={<IconBrandWhatsapp size={18} />}
+                href={mailto}
+                leftSection={<IconMail size={18} />}
               >
-                WhatsApp
+                Pedir presupuesto
               </Button>
               <Button
                 size="md"
                 variant="default"
                 component="a"
-                href={mailto}
-                leftSection={<IconMail size={18} />}
+                href={`tel:+${COMPANY.phoneRaw}`}
+                leftSection={<IconPhone size={18} />}
               >
-                Email
+                Llamar
               </Button>
             </Group>
-
-            <Text size="xs" c="dimmed" ta="center">
-              Todos los productos disponen de características técnicas y certificados CE.
-            </Text>
-          </Stack>
-        </Stack>
+            <CopyButton value={permalink} timeout={1800}>
+              {({ copied, copy }) => (
+                <Button
+                  fullWidth
+                  mt="xs"
+                  size="compact-sm"
+                  variant="subtle"
+                  color="gray"
+                  leftSection={copied ? <IconCheck size={14} /> : <IconLink size={14} />}
+                  onClick={copy}
+                >
+                  {copied ? 'Enlace copiado' : 'Copiar enlace a esta ficha'}
+                </Button>
+              )}
+            </CopyButton>
+          </Box>
+        </>
       )}
     </Drawer>
   );

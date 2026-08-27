@@ -59,6 +59,9 @@
   .inner > * > *:nth-child(6) {
     animation-delay: 390ms;
   }
+  .inner > * > *:nth-child(7) {
+    animation-delay: 460ms;
+  }
 
   @keyframes hero-in {
     from {
@@ -106,11 +109,79 @@
   max-width: 480px;
 }
 
-.jump {
-  align-self: flex-start;
-  color: rgba(255, 255, 255, 0.85);
+/* Botón secundario sobre foto: contorno claro en vez de relleno, para que el
+   blanco sólido de «Ver el catálogo» siga siendo la acción principal. */
+.ghost {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.jump:hover {
+.ghost:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #fff;
+}
+
+/* Accesos por familia: en móvil se desplazan en horizontal en lugar de apilarse
+   en cuatro líneas y empujar el resto del hero fuera de la pantalla. */
+.quick {
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.quick::-webkit-scrollbar {
+  display: none;
+}
+
+.quick > * {
+  flex: 0 0 auto;
+}
+
+@media (min-width: 48em) {
+  .quick {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+.quickBtn {
   background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+.quickBtn:hover {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+/* -------------------------------------------------------------- Cifras clave */
+
+.stats {
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  padding-top: 1.25rem;
+}
+
+.stat {
+  min-width: 0;
+}
+
+.statValue {
+  color: #fff;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.3;
+  max-width: 18ch;
 }

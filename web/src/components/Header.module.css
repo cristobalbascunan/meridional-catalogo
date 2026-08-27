@@ -5,6 +5,16 @@
   background: light-dark(rgba(255, 255, 255, 0.88), rgba(26, 27, 30, 0.88));
   backdrop-filter: blur(10px);
   border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  transition: box-shadow 200ms ease;
+}
+
+/* Al separarse de lo alto de la página la cabecera proyecta sombra: deja claro
+   que flota sobre el contenido en lugar de formar parte de él. */
+.header[data-scrolled] {
+  box-shadow: light-dark(
+    0 1px 3px rgba(15, 23, 42, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.45)
+  );
 }
 
 .top {
@@ -56,25 +66,45 @@
   }
 }
 
-.waFull {
+.phoneFull {
   display: inline-flex;
+  font-variant-numeric: tabular-nums;
 }
 
-.waIcon {
+.phoneIcon {
   display: none;
 }
 
-@media (max-width: 36em) {
-  .waFull {
+@media (max-width: 48em) {
+  .phoneFull {
     display: none;
   }
-  .waIcon {
+  .phoneIcon {
     display: inline-flex;
   }
 }
 
 .navWrap {
   border-top: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+  /*
+   * La fila de categorías se desplaza en horizontal cuando no cabe. El degradado
+   * de los extremos avisa de que hay más categorías fuera de la vista, que si no
+   * se cortan a hueso y parecen el final de la lista.
+   */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
+}
+
+@media (min-width: 88rem) {
+  /* Con sitio de sobra no hay nada que desplazar: fuera el degradado. */
+  .navWrap {
+    mask-image: none;
+  }
 }
 
 .chips {
@@ -91,4 +121,12 @@
   letter-spacing: 0;
   padding-inline: 14px;
   height: 32px;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.chip:hover:not([aria-pressed='true']) {
+  border-color: var(--mantine-color-brand-4);
+  color: var(--mantine-color-brand-6);
 }
