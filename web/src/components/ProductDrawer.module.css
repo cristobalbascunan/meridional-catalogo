@@ -5,6 +5,21 @@
   border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
 }
 
+/* Marcador de foto pendiente: deliberadamente vacío y distinto de una
+   fotografía real, para que salte a la vista qué fichas la necesitan. */
+.empty {
+  display: grid;
+  place-items: center;
+  color: var(--mantine-color-dimmed);
+  background: repeating-linear-gradient(
+    135deg,
+    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6)),
+    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6)) 10px,
+    light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7)) 10px,
+    light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7)) 20px
+  );
+}
+
 /*
  * Las acciones se quedan pegadas al fondo del panel mientras se recorre la
  * ficha: en productos con muchas características había que bajar hasta el final

@@ -35,7 +35,7 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
   const category = product ? categoryById(product.category) : null;
 
   const consulta = product
-    ? `Hola, me gustaría recibir información y presupuesto sobre "${product.name}" del catálogo ${COMPANY.catalogYear}.`
+    ? `Hola, me gustaría recibir información y presupuesto sobre "${product.name}" del catálogo general.`
     : '';
 
   const mailto = `mailto:${COMPANY.email}?subject=${encodeURIComponent(
@@ -67,12 +67,24 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
         <>
           <Stack gap="lg" pb="md">
             <Box className={classes.media} px="lg" py="md">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fit="contain"
-                h={product.imageSize === 'sm' ? 160 : 230}
-              />
+              {product.image ? (
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fit="contain"
+                  h={product.imageSize === 'sm' ? 160 : 230}
+                />
+              ) : (
+                <Box
+                  className={classes.empty}
+                  h={product.imageSize === 'sm' ? 160 : 230}
+                  aria-label="Foto pendiente"
+                >
+                  <Text size="sm" fw={600} tt="uppercase">
+                    Foto pendiente
+                  </Text>
+                </Box>
+              )}
             </Box>
 
             <Stack gap="sm" px="lg">

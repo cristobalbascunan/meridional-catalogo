@@ -39,6 +39,22 @@
   padding: var(--mantine-spacing-md);
 }
 
+/* Marcador de foto pendiente: deliberadamente vacío y distinto de una
+   fotografía real, para que salte a la vista qué fichas la necesitan. */
+.empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--mantine-color-dimmed);
+  background: repeating-linear-gradient(
+    135deg,
+    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6)),
+    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6)) 10px,
+    light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7)) 10px,
+    light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7)) 20px
+  );
+}
+
 /*
  * Piezas pequenas (hebillas, fichas, enlazadores): fotografiadas de cerca se
  * veian desproporcionadas junto a una bobina. Se les reserva menos ancho para

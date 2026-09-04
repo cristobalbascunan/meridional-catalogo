@@ -29,22 +29,30 @@ export function ProductCard({ product, showCategory, onOpen }: Props) {
         }
       }}
     >
-      <Card.Section className={classes.media}>
-        <Image
-          src={product.image}
-          alt={product.name}
-          fit="contain"
-          h={170}
-          loading="lazy"
-          decoding="async"
-          className={classes.image}
-          data-size={product.imageSize}
-          onLoad={(e) => e.currentTarget.setAttribute('data-loaded', '')}
-          // Si la imagen ya estaba en caché, `onLoad` puede no llegar a dispararse.
-          ref={(el) => {
-            if (el?.complete) el.setAttribute('data-loaded', '');
-          }}
-        />
+      <Card.Section className={classes.media} h={170}>
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fit="contain"
+            h={170}
+            loading="lazy"
+            decoding="async"
+            className={classes.image}
+            data-size={product.imageSize}
+            onLoad={(e) => e.currentTarget.setAttribute('data-loaded', '')}
+            // Si la imagen ya estaba en caché, `onLoad` puede no llegar a dispararse.
+            ref={(el) => {
+              if (el?.complete) el.setAttribute('data-loaded', '');
+            }}
+          />
+        ) : (
+          <Box className={classes.empty} aria-label="Foto pendiente">
+            <Text size="xs" fw={600} tt="uppercase">
+              Foto pendiente
+            </Text>
+          </Box>
+        )}
       </Card.Section>
 
       <Stack gap={6} mt="md" style={{ flex: 1 }}>

@@ -113,7 +113,7 @@ export function Footer({ onActive }: Props) {
             © {new Date().getFullYear()} {COMPANY.name}
           </Text>
           <Text size="xs" c="dimmed">
-            Catálogo de productos {COMPANY.catalogYear}
+            Catálogo general de productos
           </Text>
         </Group>
       </Container>

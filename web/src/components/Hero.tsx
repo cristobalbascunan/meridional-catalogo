@@ -11,7 +11,7 @@ import {
   Title,
 } from '@mantine/core';
 import { IconArrowDown, IconMail, IconSearch } from '@tabler/icons-react';
-import { COMPANY, categories, products, type CategoryId } from '../data/catalog';
+import { categories, type CategoryId } from '../data/catalog';
 import classes from './Hero.module.css';
 
 interface Props {
@@ -25,7 +25,6 @@ const goToCatalog = () =>
 
 export function Hero({ query, onQuery, onActive }: Props) {
   const stats = [
-    { value: products.length, label: 'referencias' },
     { value: categories.length, label: 'familias de producto' },
     { value: 'CE', label: 'certificado en todos los productos' },
   ];
@@ -36,7 +35,7 @@ export function Hero({ query, onQuery, onActive }: Props) {
       <Container size="xl" className={classes.inner}>
         <Stack gap="lg" maw={760}>
           <Badge size="lg" radius="xl" className={classes.year}>
-            Catálogo {COMPANY.catalogYear}
+            Catálogo general
           </Badge>
 
           <Title order={1} c="white">
@@ -44,9 +43,8 @@ export function Hero({ query, onQuery, onActive }: Props) {
           </Title>
 
           <Text size="lg" className={classes.lead}>
-            {products.length} referencias en precinto, film estirable, burbuja, foam, fleje,
-            cartón, palés y maquinaria. Consulta la ficha técnica de cada producto y pídenos
-            presupuesto sin compromiso.
+            Precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria.
+            Consulta la ficha técnica de cada producto y pídenos presupuesto sin compromiso.
           </Text>
 
           <TextInput

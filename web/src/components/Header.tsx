@@ -98,8 +98,8 @@ export function Header({ query, onQuery, active, onActive }: Props) {
               src={asset('img/logo.png')}
               alt="Meridional Plastic"
               className={classes.logo}
-              width={140}
-              height={34}
+              width={205}
+              height={44}
             />
           </a>
 

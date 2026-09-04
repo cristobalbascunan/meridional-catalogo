@@ -31,7 +31,8 @@ export interface Product {
   category: CategoryId;
   /** Familia dentro de la categoría, se usa como subtítulo y para agrupar. */
   family: string;
-  image: string;
+  /** Sin foto real todavía confirmada: se deja vacío a propósito para que se note. */
+  image?: string;
   /** Piezas pequeñas (hebillas, fichas): se muestran a menor tamaño. */
   imageSize?: "sm";
   summary: string;
@@ -42,12 +43,7 @@ export interface Product {
   variants?: string[];
 }
 
-export const TAGS = [
-  "Impresión personalizada",
-  "Uso manual",
-  "Uso automático",
-  "A medida",
-] as const;
+export const TAGS = ["Uso manual", "Uso automático", "A medida"] as const;
 
 export type Tag = (typeof TAGS)[number];
 
@@ -64,7 +60,6 @@ export const COMPANY = {
   phone: "976 158 711",
   /** Mismo número sin separadores, para los enlaces tel: */
   phoneRaw: "34976158711",
-  catalogYear: 2026,
 };
 
 const rawCategories: Category[] = [
@@ -149,7 +144,6 @@ const rawProducts: Product[] = [
     name: "Precinto polipropileno acrílico",
     category: "cintas",
     family: "Precinto",
-    image: "/img/pp-acrilico.jpg",
     summary:
       "Precinto de polipropileno con adhesivo acrílico de base agua, en cajas de 36 rollos.",
     specs: [
@@ -164,7 +158,6 @@ const rawProducts: Product[] = [
     name: "Precinto polipropileno solvente",
     category: "cintas",
     family: "Precinto",
-    image: "/img/pp-solvente.jpg",
     summary:
       "Adhesivo solvente de caucho natural con excelente adhesión incluso en cartón reciclado.",
     specs: [
@@ -181,7 +174,6 @@ const rawProducts: Product[] = [
     name: "Precinto impreso",
     category: "cintas",
     family: "Precinto",
-    image: "/img/precinto-impreso.jpg",
     summary:
       "Precinto personalizado con el logo de su empresa, hasta 3 tintas y fondo negativo.",
     specs: [
@@ -190,7 +182,7 @@ const rawProducts: Product[] = [
       "Distintos colores",
       "Impresión hasta 3 tintas y fondo negativo",
     ],
-    tags: ["Impresión personalizada", "Uso manual", "Uso automático"],
+    tags: ["Uso manual", "Uso automático"],
   },
   {
     id: "precinto-muy-fragil",
@@ -262,7 +254,8 @@ const rawProducts: Product[] = [
       "Ancho 500 · 23 my · 1,5 kg (mandril de 300 g)",
       "Presentado en cajas de 6 bobinas",
       "60 cajas por palé",
-      "Kilos reales",
+      "Producto de máxima calidad",
+      "Metraje y peso verificado",
     ],
     tags: ["Uso manual"],
   },
@@ -286,16 +279,15 @@ const rawProducts: Product[] = [
     name: "Film ancho 500 · 23 my · uso automático",
     category: "film",
     family: "Film estirable",
-    image: "/img/film-impreso.jpg",
     summary:
       "Film estirable para paletizar de forma automática con envolvedora, en palé de 750 kg o en bobinas sueltas.",
     specs: [
       "Polietileno de baja densidad (PEBD)",
       "Presentación en palé de 750 kg o bobinas sueltas",
-      "Disponible en transparente y en color",
-      "Posibilidad de impresión en 3 colores",
+      "Disponemos en transparente y color con posibilidad de impresión hasta en 3 colores",
+      "Metraje y peso verificado",
     ],
-    tags: ["Uso automático", "Impresión personalizada"],
+    tags: ["Uso automático"],
   },
 
   /* ----------------------------------------------------------------- BURBUJA */
@@ -429,7 +421,6 @@ const rawProducts: Product[] = [
     name: "Lámina retráctil",
     category: "polietileno",
     family: "Lámina",
-    image: "/img/lamina-retractil.jpg",
     summary:
       "Lámina de polietileno de baja densidad con gran capacidad de retracción, que se adapta a la forma del producto.",
     specs: [
@@ -469,7 +460,7 @@ const rawProducts: Product[] = [
       "Distintos tamaños y gramajes",
       "Estándar, troqueladas, con y sin asas, autocierre",
     ],
-    tags: ["Impresión personalizada", "A medida"],
+    tags: ["A medida"],
   },
 
   /* ------------------------------------------------------------------- FLEJE */
@@ -488,7 +479,7 @@ const rawProducts: Product[] = [
       "Distintos anchos y espesores",
       "Posibilidad de impresión",
     ],
-    tags: ["Impresión personalizada", "Uso manual", "Uso automático"],
+    tags: ["Uso manual", "Uso automático"],
   },
   {
     id: "fleje-pet",
@@ -505,7 +496,7 @@ const rawProducts: Product[] = [
       "Distintos anchos y espesores",
       "Posibilidad de impresión",
     ],
-    tags: ["Impresión personalizada", "Uso manual", "Uso automático"],
+    tags: ["Uso manual", "Uso automático"],
   },
   {
     id: "fleje-textil",
@@ -522,7 +513,7 @@ const rawProducts: Product[] = [
       "Distintos colores y medidas",
       "Posibilidad de impresión",
     ],
-    tags: ["Impresión personalizada", "Uso manual"],
+    tags: ["Uso manual"],
   },
   {
     id: "fleje-metalico",
@@ -559,7 +550,6 @@ const rawProducts: Product[] = [
     name: "Tensores",
     category: "fleje",
     family: "Accesorios",
-    image: "/img/flejadora.jpg",
     summary:
       "El tensor manual permite tensar y cortar flejes de PP, PET, hot melt y composite de 19 a 25 mm.",
     specs: [
@@ -589,7 +579,6 @@ const rawProducts: Product[] = [
     name: "Mesa flejadora semiautomática",
     category: "fleje",
     family: "Accesorios",
-    image: "/img/flejadora.jpg",
     summary:
       "Mesa flejadora de alto rendimiento para flejes de polipropileno y poliéster.",
     specs: [
@@ -603,7 +592,6 @@ const rawProducts: Product[] = [
     name: "Carros devanadores",
     category: "fleje",
     family: "Accesorios",
-    image: "/img/portarrollos.jpg",
     summary:
       "Dispensador móvil de color azul para fleje, con cajetín en la parte superior para las fichas y las hebillas.",
     specs: [
@@ -659,7 +647,7 @@ const rawProducts: Product[] = [
       "Posibilidad de impresión",
       "Producto reciclable",
     ],
-    tags: ["A medida", "Impresión personalizada"],
+    tags: ["A medida"],
   },
   {
     id: "cantoneras",
@@ -704,15 +692,16 @@ const rawProducts: Product[] = [
     summary:
       "Palés de segundo uso: más manejables y económicos que el europalé, en las medidas más habituales.",
     specs: [
-      "Palé americano 800 × 600 mm",
-      "800 × 1200 mm ligero",
-      "800 × 1200 mm fuerte (hasta 750 kg)",
-      "Resistente, más manejable y económico que el europalé",
+      "Palé ligero 800 × 1200 mm (2.º uso)",
+      "Palé fuerte 800 × 1200 mm (750 kg): muy resistente, más manejable y económico que el europalé",
+      "Palé 600 × 800 mm",
+      "Palé americano CP5 / CP7",
     ],
     variants: [
-      "Americano 800 × 600",
       "800 × 1200 ligero",
       "800 × 1200 fuerte",
+      "600 × 800",
+      "Americano CP5 / CP7",
     ],
     tags: [],
   },
@@ -776,7 +765,7 @@ export const categories: Category[] = rawCategories.map((c) => ({
 
 export const products: Product[] = rawProducts.map((p) => ({
   ...p,
-  image: asset(p.image),
+  image: p.image ? asset(p.image) : undefined,
 }));
 
 export const productsByCategory = (id: CategoryId) =>
