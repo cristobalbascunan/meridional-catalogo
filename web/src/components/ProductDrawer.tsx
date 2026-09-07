@@ -20,6 +20,7 @@ import {
   IconLink,
   IconMail,
   IconPhone,
+  IconPhoto,
 } from '@tabler/icons-react';
 import { COMPANY, categoryById, type Product } from '../data/catalog';
 import classes from './ProductDrawer.module.css';
@@ -80,7 +81,8 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
                   h={product.imageSize === 'sm' ? 160 : 230}
                   aria-label="Foto pendiente"
                 >
-                  <Text size="sm" fw={600} tt="uppercase">
+                  <IconPhoto size={36} stroke={1.5} />
+                  <Text size="sm" fw={500}>
                     Foto pendiente
                   </Text>
                 </Box>

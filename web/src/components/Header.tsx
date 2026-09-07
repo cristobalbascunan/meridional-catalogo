@@ -1,42 +1,40 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   CloseButton,
   Container,
   Group,
-  ScrollArea,
   TextInput,
   Tooltip,
   useComputedColorScheme,
   useMantineColorScheme,
-} from '@mantine/core';
-import { useHotkeys, useMediaQuery, useWindowScroll } from '@mantine/hooks';
-import { IconMoon, IconPhone, IconSearch, IconSun } from '@tabler/icons-react';
-import { COMPANY, asset, categories, type CategoryId } from '../data/catalog';
-import classes from './Header.module.css';
+} from "@mantine/core";
+import { useHotkeys, useMediaQuery, useWindowScroll } from "@mantine/hooks";
+import { IconMoon, IconPhone, IconSearch, IconSun } from "@tabler/icons-react";
+import { COMPANY, asset } from "../data/catalog";
+import classes from "./Header.module.css";
 
 interface Props {
   query: string;
   onQuery: (v: string) => void;
-  active: CategoryId | 'all';
-  onActive: (v: CategoryId | 'all') => void;
 }
 
-export function Header({ query, onQuery, active, onActive }: Props) {
+export function Header({ query, onQuery }: Props) {
   const { setColorScheme } = useMantineColorScheme();
-  const scheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const scheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const [searchOpen, setSearchOpen] = useState(false);
   const [scroll] = useWindowScroll();
 
   // Con una búsqueda activa el campo permanece visible aunque no se haya desplegado
   // a mano, para que se vea qué se está filtrando.
-  const showSearchRow = searchOpen || query !== '';
+  const showSearchRow = searchOpen || query !== "";
 
   // El campo ancho sólo existe a partir de 62em; por debajo se usa el desplegable.
-  const wideSearch = useMediaQuery('(min-width: 62em)', true);
+  const wideSearch = useMediaQuery("(min-width: 62em)", true);
 
   const deskRef = useRef<HTMLInputElement>(null);
   // El campo del desplegable se monta una sola vez (se muestra y oculta por CSS),
@@ -52,26 +50,24 @@ export function Header({ query, onQuery, active, onActive }: Props) {
     else setSearchOpen(true);
   };
   useHotkeys([
-    ['/', focusSearch],
-    ['mod+K', focusSearch],
+    ["/", focusSearch],
+    ["mod+K", focusSearch],
   ]);
 
   const toggleSearch = () => {
     if (showSearchRow) {
       setSearchOpen(false);
-      onQuery('');
+      onQuery("");
     } else {
       setSearchOpen(true);
     }
   };
 
-  const chips: { id: CategoryId | 'all'; label: string }[] = [
-    { id: 'all', label: 'Todo el catálogo' },
-    ...categories.map((c) => ({ id: c.id, label: c.name })),
-  ];
-
   /** El campo de búsqueda es el mismo arriba y en el desplegable. */
-  const searchInput = (ref: React.RefObject<HTMLInputElement | null>, className?: string) => (
+  const searchInput = (
+    ref: React.RefObject<HTMLInputElement | null>,
+    className?: string,
+  ) => (
     <TextInput
       className={className}
       ref={ref}
@@ -81,7 +77,11 @@ export function Header({ query, onQuery, active, onActive }: Props) {
       leftSection={<IconSearch size={16} />}
       rightSection={
         query ? (
-          <CloseButton size="sm" onClick={() => onQuery('')} aria-label="Limpiar búsqueda" />
+          <CloseButton
+            size="sm"
+            onClick={() => onQuery("")}
+            aria-label="Limpiar búsqueda"
+          />
         ) : null
       }
       radius="xl"
@@ -90,16 +90,24 @@ export function Header({ query, onQuery, active, onActive }: Props) {
   );
 
   return (
-    <Box component="header" className={classes.header} data-scrolled={scroll.y > 8 || undefined}>
+    <Box
+      component="header"
+      className={classes.header}
+      data-scrolled={scroll.y > 8 || undefined}
+    >
       <Container size="xl" className={classes.top}>
         <Group justify="space-between" wrap="nowrap" gap="sm">
-          <a href="#inicio" className={classes.brand} aria-label="Meridional Plastic — inicio">
+          <a
+            href="#inicio"
+            className={classes.brand}
+            aria-label="Meridional Plastic — inicio"
+          >
             <img
-              src={asset('img/logo.png')}
+              src={asset("img/logo.png")}
               alt="Meridional Plastic"
               className={classes.logo}
-              width={205}
-              height={44}
+              width={280}
+              height={60}
             />
           </a>
 
@@ -108,25 +116,33 @@ export function Header({ query, onQuery, active, onActive }: Props) {
           <Group gap="xs" wrap="nowrap">
             <ActionIcon
               className={classes.searchToggle}
-              variant={query ? 'filled' : 'default'}
+              variant={query ? "filled" : "default"}
               size="lg"
               radius="xl"
-              aria-label={showSearchRow ? 'Cerrar el buscador' : 'Abrir el buscador'}
+              aria-label={
+                showSearchRow ? "Cerrar el buscador" : "Abrir el buscador"
+              }
               aria-expanded={showSearchRow}
               onClick={toggleSearch}
             >
               <IconSearch size={18} />
             </ActionIcon>
 
-            <Tooltip label={scheme === 'dark' ? 'Modo claro' : 'Modo oscuro'}>
+            <Tooltip label={scheme === "dark" ? "Modo claro" : "Modo oscuro"}>
               <ActionIcon
                 variant="default"
                 size="lg"
                 radius="xl"
                 aria-label="Cambiar tema"
-                onClick={() => setColorScheme(scheme === 'dark' ? 'light' : 'dark')}
+                onClick={() =>
+                  setColorScheme(scheme === "dark" ? "light" : "dark")
+                }
               >
-                {scheme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+                {scheme === "dark" ? (
+                  <IconSun size={18} />
+                ) : (
+                  <IconMoon size={18} />
+                )}
               </ActionIcon>
             </Tooltip>
 
@@ -152,34 +168,13 @@ export function Header({ query, onQuery, active, onActive }: Props) {
           </Group>
         </Group>
 
-        <Box className={classes.searchRow} data-open={showSearchRow || undefined}>
+        <Box
+          className={classes.searchRow}
+          data-open={showSearchRow || undefined}
+        >
           {searchInput(searchRef)}
         </Box>
       </Container>
-
-      <Box component="nav" className={classes.navWrap} aria-label="Categorías del catálogo">
-        <Container size="xl" px={0}>
-          <ScrollArea type="never" offsetScrollbars={false}>
-            <Group gap={8} wrap="nowrap" className={classes.chips}>
-              {chips.map((c) => (
-                <Badge
-                  key={c.id}
-                  component="button"
-                  type="button"
-                  size="lg"
-                  radius="xl"
-                  variant={active === c.id ? 'filled' : 'default'}
-                  className={classes.chip}
-                  onClick={() => onActive(c.id)}
-                  aria-pressed={active === c.id}
-                >
-                  {c.label}
-                </Badge>
-              ))}
-            </Group>
-          </ScrollArea>
-        </Container>
-      </Box>
     </Box>
   );
 }

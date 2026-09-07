@@ -2,8 +2,9 @@
  * Listado de productos de la web de Meridional Plastic, S.L.
  *
  * El contenido sigue el fichero "LISTADO DE PRODUCTOS WEB.xlsx" facilitado por
- * el cliente. Donde el Excel indica «TEXTO CATALOGO» se conserva la redacción
- * del catálogo de 2024 en PDF.
+ * el cliente, con las correcciones posteriores de "CORRECCIONES.docx". Donde el
+ * Excel indica «TEXTO CATALOGO» se conserva la redacción del catálogo de 2024 en
+ * PDF.
  */
 
 export type CategoryId =
@@ -33,8 +34,13 @@ export interface Product {
   family: string;
   /** Sin foto real todavía confirmada: se deja vacío a propósito para que se note. */
   image?: string;
-  /** Piezas pequeñas (hebillas, fichas): se muestran a menor tamaño. */
-  imageSize?: "sm";
+  /**
+  * Ajuste de encaje de la foto: "sm" para piezas pequeñas (hebillas, fichas),
+  * que de cerca se veían desproporcionadas junto a una bobina, y "lg" para las
+  * fotos verticales, que con el relleno normal quedaban mucho más pequeñas que
+  * el resto de la fila.
+  */
+  imageSize?: "sm" | "lg";
   summary: string;
   specs: string[];
   /** Etiquetas transversales, usadas por el filtro rápido. */
@@ -143,7 +149,8 @@ const rawProducts: Product[] = [
     id: "precinto-acrilico",
     name: "Precinto polipropileno acrílico",
     category: "cintas",
-    family: "Precinto",
+    family: "Precinto · uso manual",
+    image: "/img/pp-acrilico.jpg",
     summary:
       "Precinto de polipropileno con adhesivo acrílico de base agua, en cajas de 36 rollos.",
     specs: [
@@ -151,13 +158,14 @@ const rawProducts: Product[] = [
       "Fabricado en polipropileno con adhesivo acrílico (base agua)",
       "Disponible en color marrón y transparente",
     ],
-    tags: ["Uso manual", "Uso automático"],
+    tags: ["Uso manual"],
   },
   {
     id: "precinto-solvente",
     name: "Precinto polipropileno solvente",
     category: "cintas",
-    family: "Precinto",
+    family: "Precinto · uso manual",
+    image: "/img/pp-solvente.jpg",
     summary:
       "Adhesivo solvente de caucho natural con excelente adhesión incluso en cartón reciclado.",
     specs: [
@@ -167,13 +175,14 @@ const rawProducts: Product[] = [
       "Aguanta temperaturas extremas y la humedad",
       "Disponible en color marrón y transparente",
     ],
-    tags: ["Uso manual", "Uso automático"],
+    tags: ["Uso manual"],
   },
   {
     id: "precinto-impreso",
     name: "Precinto impreso",
     category: "cintas",
-    family: "Precinto",
+    family: "Precinto · uso manual",
+    image: "/img/precinto-impreso.jpg",
     summary:
       "Precinto personalizado con el logo de su empresa, hasta 3 tintas y fondo negativo.",
     specs: [
@@ -182,13 +191,13 @@ const rawProducts: Product[] = [
       "Distintos colores",
       "Impresión hasta 3 tintas y fondo negativo",
     ],
-    tags: ["Uso manual", "Uso automático"],
+    tags: ["Uso manual"],
   },
   {
     id: "precinto-muy-fragil",
     name: "Precinto impreso fondo blanco «MUY FRÁGIL»",
     category: "cintas",
-    family: "Precinto",
+    family: "Precinto · uso manual",
     image: "/img/precinto-muy-fragil.jpg",
     summary:
       "Precinto de aviso con fondo blanco e impresión «MUY FRÁGIL» para señalizar sus expediciones.",
@@ -199,7 +208,7 @@ const rawProducts: Product[] = [
     id: "precinto-automatico",
     name: "Precinto PP solvente transparente · uso automático",
     category: "cintas",
-    family: "Precinto",
+    family: "Precinto · uso automático",
     image: "/img/precinto-automatico.jpg",
     summary:
       "Bobinas para precintadora automática, en presentación de 6 rollos por caja.",
@@ -246,7 +255,7 @@ const rawProducts: Product[] = [
     id: "film-manual",
     name: "Film ancho 500 · 23 my · manual",
     category: "film",
-    family: "Film estirable",
+    family: "Film estirable · uso manual",
     image: "/img/film-estirable.jpg",
     summary:
       "Film estirable de polietileno de baja densidad (PEBD), en cajas de 6 bobinas, para paletizar su mercancía de forma manual.",
@@ -263,7 +272,7 @@ const rawProducts: Product[] = [
     id: "minifilm",
     name: "Minifilm",
     category: "film",
-    family: "Film estirable",
+    family: "Film estirable · uso manual",
     image: "/img/minifilm.jpg",
     summary:
       "Film de ancho 100 en polietileno de baja densidad (PEBD), muy sencillo y ágil de utilizar.",
@@ -278,7 +287,8 @@ const rawProducts: Product[] = [
     id: "film-automatico",
     name: "Film ancho 500 · 23 my · uso automático",
     category: "film",
-    family: "Film estirable",
+    family: "Film estirable · uso automático",
+    image: "/img/film-impreso.jpg",
     summary:
       "Film estirable para paletizar de forma automática con envolvedora, en palé de 750 kg o en bobinas sueltas.",
     specs: [
@@ -421,6 +431,7 @@ const rawProducts: Product[] = [
     name: "Lámina retráctil",
     category: "polietileno",
     family: "Lámina",
+    image: "/img/lamina-retractil.jpg",
     summary:
       "Lámina de polietileno de baja densidad con gran capacidad de retracción, que se adapta a la forma del producto.",
     specs: [
@@ -592,6 +603,8 @@ const rawProducts: Product[] = [
     name: "Carros devanadores",
     category: "fleje",
     family: "Accesorios",
+    image: "/img/portarrollos.jpg",
+    imageSize: "lg",
     summary:
       "Dispensador móvil de color azul para fleje, con cajetín en la parte superior para las fichas y las hebillas.",
     specs: [
