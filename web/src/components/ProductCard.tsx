@@ -1,5 +1,5 @@
 import { Badge, Box, Card, Group, Image, Stack, Text } from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import { IconArrowRight, IconPhoto } from '@tabler/icons-react';
 import { categoryById, type Product } from '../data/catalog';
 import classes from './ProductCard.module.css';
 
@@ -48,7 +48,8 @@ export function ProductCard({ product, showCategory, onOpen }: Props) {
           />
         ) : (
           <Box className={classes.empty} aria-label="Foto pendiente">
-            <Text size="xs" fw={600} tt="uppercase">
+            <IconPhoto size={28} stroke={1.5} />
+            <Text size="xs" fw={500}>
               Foto pendiente
             </Text>
           </Box>

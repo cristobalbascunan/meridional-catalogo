@@ -24,10 +24,26 @@
 /* Barra de filtros: una tarjeta ligera que la separa de la rejilla en lugar de
    dejar los chips flotando sobre el fondo. */
 .toolbar {
-  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
+  /* Se queda pegada bajo la cabecera: al recorrer el catálogo se puede cambiar
+     de categoría sin volver arriba, que es lo que antes hacía la fila de
+     pestañas de la cabecera. */
+  position: sticky;
+  top: var(--mp-header-h);
+  z-index: 100;
+  background: light-dark(rgba(248, 249, 250, 0.92), rgba(37, 38, 43, 0.92));
+  backdrop-filter: blur(10px);
   border: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
   border-radius: var(--mantine-radius-lg);
   padding: var(--mantine-spacing-md);
+}
+
+/* En móvil la barra ocupa dos filas: pegarla dejaría media pantalla de filtros,
+   así que ahí se queda quieta y se recorre con el resto de la página. */
+@media (max-width: 48em) {
+  .toolbar {
+    position: static;
+    backdrop-filter: none;
+  }
 }
 
 /* Zona que se funde al cambiar de categoría o de filtro. */

@@ -88,6 +88,21 @@ export default function App() {
     [base, tags],
   );
 
+  // Recuento por categoría dentro de la búsqueda activa: el chip enseña cuántos
+  // productos daría y se desactiva si no daría ninguno.
+  const categoryCounts = useMemo(() => {
+    const q = norm(query.trim());
+    const terms = q ? q.split(/\s+/) : [];
+    const match = (p: Product) =>
+      terms.length === 0 || terms.every((t) => haystack(p).includes(t));
+    const counts = {} as Record<CategoryId | 'all', number>;
+    counts.all = products.filter(match).length;
+    for (const c of categories) {
+      counts[c.id] = products.filter((p) => p.category === c.id && match(p)).length;
+    }
+    return counts;
+  }, [query]);
+
   const tagCounts = useMemo(() => {
     const counts = {} as Record<Tag, number>;
     for (const t of TAGS) counts[t] = base.filter((p) => p.tags.includes(t)).length;
@@ -164,6 +179,11 @@ export default function App() {
     };
   }, []);
 
+  const catChips: { id: CategoryId | 'all'; label: string }[] = [
+    { id: 'all', label: 'Todo el catálogo' },
+    ...categories.map((c) => ({ id: c.id, label: c.name })),
+  ];
+
   const grid = (list: Product[], showCategory = false) => (
     <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 4 }} spacing="md" verticalSpacing="md">
       {list.map((p) => (
@@ -183,12 +203,7 @@ export default function App() {
         Saltar al catálogo
       </a>
 
-      <Header
-        query={query}
-        onQuery={handleQuery}
-        active={active}
-        onActive={changeCategory}
-      />
+      <Header query={query} onQuery={handleQuery} />
 
       <Hero query={query} onQuery={handleQuery} onActive={changeCategory} />
 
@@ -196,10 +211,34 @@ export default function App() {
         <Stack gap="xl">
           {/* Barra de filtros */}
           <Box className={classes.toolbar}>
-            <Group justify="space-between" align="flex-end" gap="md">
+            <Box>
+              <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={8}>
+                Categoría
+              </Text>
+              <Group gap={8} className={classes.filterRow} wrap="nowrap">
+                {catChips.map((c) => (
+                  <Chip
+                    key={c.id}
+                    checked={active === c.id}
+                    onChange={() => changeCategory(c.id)}
+                    variant="outline"
+                    radius="xl"
+                    size="sm"
+                    disabled={categoryCounts[c.id] === 0 && active !== c.id}
+                  >
+                    {c.label}{' '}
+                    <Text span c="dimmed" fz="xs">
+                      {categoryCounts[c.id]}
+                    </Text>
+                  </Chip>
+                ))}
+              </Group>
+            </Box>
+
+            <Group justify="space-between" align="flex-end" gap="md" mt="md">
               <Box>
                 <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={8}>
-                  Filtrar por característica
+                  Característica
                 </Text>
                 <Chip.Group
                   multiple
