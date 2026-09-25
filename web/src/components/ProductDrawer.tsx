@@ -18,11 +18,15 @@ import {
   IconCheck,
   IconCircleCheck,
   IconLink,
-  IconMail,
   IconPhone,
-  IconPhoto,
+  IconPlus,
+  IconSend,
 } from '@tabler/icons-react';
 import { COMPANY, categoryById, type Product } from '../data/catalog';
+import { absolute, productPath } from '../hooks/useRoute';
+import { openQuoteForm, quote, useQuote } from '../hooks/useQuote';
+import { PhotoFallback } from './PhotoFallback';
+import { WhatsAppButton } from './WhatsAppButton';
 import classes from './ProductDrawer.module.css';
 
 interface Props {
@@ -34,20 +38,14 @@ interface Props {
 export function ProductDrawer({ product, opened, onClose }: Props) {
   const isMobile = useMediaQuery('(max-width: 48em)');
   const category = product ? categoryById(product.category) : null;
+  const inQuote = useQuote().includes(product?.id ?? '');
 
   const consulta = product
-    ? `Hola, me gustaría recibir información y presupuesto sobre "${product.name}" del catálogo general.`
+    ? `Buenos días, me gustaría recibir presupuesto de "${product.name}" del catálogo general.`
     : '';
 
-  const mailto = `mailto:${COMPANY.email}?subject=${encodeURIComponent(
-    product ? `Consulta sobre ${product.name}` : 'Consulta',
-  )}&body=${encodeURIComponent(consulta)}`;
-
   // Enlace directo a esta ficha, para poder pasársela a un cliente o a un compañero.
-  const permalink =
-    product && typeof window !== 'undefined'
-      ? `${window.location.origin}${window.location.pathname}#p/${product.id}`
-      : '';
+  const permalink = product ? absolute(productPath(product)) : '';
 
   return (
     <Drawer
@@ -76,16 +74,7 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
                   h={product.imageSize === 'sm' ? 160 : 230}
                 />
               ) : (
-                <Box
-                  className={classes.empty}
-                  h={product.imageSize === 'sm' ? 160 : 230}
-                  aria-label="Foto pendiente"
-                >
-                  <IconPhoto size={36} stroke={1.5} />
-                  <Text size="sm" fw={500}>
-                    Foto pendiente
-                  </Text>
-                </Box>
+                <PhotoFallback product={product} h={product.imageSize === 'sm' ? 160 : 230} />
               )}
             </Box>
 
@@ -161,21 +150,33 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
             <Group grow wrap="nowrap" gap="xs">
               <Button
                 size="md"
-                component="a"
-                href={mailto}
-                leftSection={<IconMail size={18} />}
+                leftSection={<IconSend size={18} />}
+                onClick={() => openQuoteForm(product.id)}
               >
                 Pedir presupuesto
               </Button>
               <Button
                 size="md"
+                variant={inQuote ? 'light' : 'default'}
+                color={inQuote ? 'teal' : undefined}
+                leftSection={inQuote ? <IconCheck size={18} /> : <IconPlus size={18} />}
+                onClick={() => quote.toggle(product.id)}
+              >
+                {inQuote ? 'En mi solicitud' : 'Añadir a la solicitud'}
+              </Button>
+            </Group>
+
+            <Group grow wrap="nowrap" gap="xs" mt="xs">
+              <Button
+                size="sm"
                 variant="default"
                 component="a"
                 href={`tel:+${COMPANY.phoneRaw}`}
-                leftSection={<IconPhone size={18} />}
+                leftSection={<IconPhone size={16} />}
               >
                 Llamar
               </Button>
+              <WhatsAppButton size="sm" variant="default" text={consulta} />
             </Group>
             <CopyButton value={permalink} timeout={1800}>
               {({ copied, copy }) => (

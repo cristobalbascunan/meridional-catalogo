@@ -5,17 +5,6 @@
   border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
 }
 
-/* Marcador de foto pendiente: un hueco neutro y discreto. Antes iba a rayas
-   para que cantase, pero con la mayoría de fotos ya puestas sólo hacía que las
-   dos fichas que faltan pareciesen rotas al lado del resto. */
-.empty {
-  display: grid;
-  place-items: center;
-  gap: 6px;
-  color: light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-2));
-  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
-}
-
 /*
  * Las acciones se quedan pegadas al fondo del panel mientras se recorre la
  * ficha: en productos con muchas características había que bajar hasta el final

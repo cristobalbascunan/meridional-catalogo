@@ -35,11 +35,11 @@ export interface Product {
   /** Sin foto real todavía confirmada: se deja vacío a propósito para que se note. */
   image?: string;
   /**
-  * Ajuste de encaje de la foto: "sm" para piezas pequeñas (hebillas, fichas),
-  * que de cerca se veían desproporcionadas junto a una bobina, y "lg" para las
-  * fotos verticales, que con el relleno normal quedaban mucho más pequeñas que
-  * el resto de la fila.
-  */
+   * Ajuste de encaje de la foto: "sm" para piezas pequeñas (hebillas, fichas),
+   * que de cerca se veían desproporcionadas junto a una bobina, y "lg" para las
+   * fotos verticales, que con el relleno normal quedaban mucho más pequeñas que
+   * el resto de la fila.
+   */
   imageSize?: "sm" | "lg";
   summary: string;
   specs: string[];
@@ -62,11 +62,49 @@ export const COMPANY = {
   claim: "Productos para envase y embalaje",
   address: "Pol. Ind. Malpica Alfindén, Calle F, Nave 14",
   city: "50171 La Puebla de Alfindén, Zaragoza, España",
+  /** Sólo la localidad, para titulares y meta descripciones. */
+  town: "La Puebla de Alfindén",
+  province: "Zaragoza",
   email: "info@meridionalplastic.com",
   phone: "976 158 711",
   /** Mismo número sin separadores, para los enlaces tel: */
   phoneRaw: "34976158711",
+  /**
+   * Número de WhatsApp en formato internacional sin signos, p. ej. "34600112233".
+   * Vacío mientras el cliente no facilite una línea móvil: el botón de WhatsApp
+   * no se dibuja hasta que tenga valor (el fijo de arriba no sirve).
+   */
+  whatsapp: "",
 };
+
+/**
+ * Dominio público del sitio. Lo necesitan las URL canónicas, la imagen de
+ * Open Graph y el sitemap, que han de ser absolutas. Se puede sobrescribir al
+ * compilar con `VITE_SITE_URL` si el sitio se publica en otro dominio.
+ */
+export const SITE_URL = (
+  import.meta.env.VITE_SITE_URL || "https://www.meridionalplastic.com"
+).replace(/\/$/, "");
+
+/**
+ * Motivos de compra que se muestran en la portada. Sólo afirmaciones que el
+ * propio catálogo respalda; plazos de entrega, años de actividad o zona de
+ * reparto habrá que añadirlos aquí cuando el cliente los confirme.
+ */
+export const HIGHLIGHTS = [
+  {
+    value: "Su logotipo",
+    label: "Precinto impreso hasta 3 tintas y film hasta 4",
+  },
+  {
+    value: "A medida",
+    label: "Formatos y medidas fuera de catálogo",
+  },
+  {
+    value: "Certificado CE",
+    label: "Con ficha técnica en todos los productos",
+  },
+] as const;
 
 const rawCategories: Category[] = [
   {
@@ -280,8 +318,9 @@ const rawProducts: Product[] = [
       "Ancho 100",
       "Cajas de 54 bobinas",
       "Unión de pequeños paquetes y protección de superficies delicadas",
+      "Metraje y peso verificado",
     ],
-    tags: ["Uso manual"],
+    tags: ["Uso manual", "Uso automático"],
   },
   {
     id: "film-automatico",
@@ -294,7 +333,7 @@ const rawProducts: Product[] = [
     specs: [
       "Polietileno de baja densidad (PEBD)",
       "Presentación en palé de 750 kg o bobinas sueltas",
-      "Disponemos en transparente y color con posibilidad de impresión hasta en 3 colores",
+      "Disponemos en transparente y color con posibilidad de impresión hasta en 4 colores",
       "Metraje y peso verificado",
     ],
     tags: ["Uso automático"],
@@ -352,7 +391,10 @@ const rawProducts: Product[] = [
     image: "/img/burbuja-kraft.jpg",
     summary:
       "Bobinas de burbuja con papel Kraft para una protección total de la mercancía.",
-    specs: ["Protección total", "Evita las roturas por cantos afilados o golpes"],
+    specs: [
+      "Protección total",
+      "Evita las roturas por cantos afilados o golpes",
+    ],
     tags: [],
   },
   {
@@ -698,14 +740,14 @@ const rawProducts: Product[] = [
   },
   {
     id: "pales-segundo-uso",
-    name: "Palés de 2.º uso",
+    name: "Palés de 2.º uso (ligero)",
     category: "pales",
     family: "Palés",
     image: "/img/palets.jpg",
     summary:
       "Palés de segundo uso: más manejables y económicos que el europalé, en las medidas más habituales.",
     specs: [
-      "Palé ligero 800 × 1200 mm (2.º uso)",
+      "Palé ligero 800 × 1200 mm (2.º uso) (ligero)",
       "Palé fuerte 800 × 1200 mm (750 kg): muy resistente, más manejable y económico que el europalé",
       "Palé 600 × 800 mm",
       "Palé americano CP5 / CP7",
@@ -734,7 +776,7 @@ const rawProducts: Product[] = [
       "Versión FRD con pantalla y selector de parámetros JOG",
     ],
     variants: ["Base", "FRD"],
-    tags: ["Uso automático"],
+    tags: [],
   },
   {
     id: "envolvedora-masterwrap",
@@ -750,7 +792,7 @@ const rawProducts: Product[] = [
       "6 recetas programables",
       "Ciclo de subida y bajada, o sólo subida o sólo bajada",
     ],
-    tags: ["Uso automático"],
+    tags: [],
   },
   {
     id: "envolvedora-robot",
@@ -766,7 +808,7 @@ const rawProducts: Product[] = [
       "6 programas memorizables",
       "Regulación de la velocidad de rotación",
     ],
-    tags: ["Uso automático"],
+    tags: [],
   },
 ];
 

@@ -6,14 +6,14 @@ import {
   CloseButton,
   Container,
   Group,
+  Indicator,
   TextInput,
   Tooltip,
-  useComputedColorScheme,
-  useMantineColorScheme,
 } from "@mantine/core";
 import { useHotkeys, useMediaQuery, useWindowScroll } from "@mantine/hooks";
-import { IconMoon, IconPhone, IconSearch, IconSun } from "@tabler/icons-react";
+import { IconPhone, IconSearch, IconSend } from "@tabler/icons-react";
 import { COMPANY, asset } from "../data/catalog";
+import { openQuoteForm, useQuote } from "../hooks/useQuote";
 import classes from "./Header.module.css";
 
 interface Props {
@@ -21,13 +21,19 @@ interface Props {
   onQuery: (v: string) => void;
 }
 
+/**
+ * A partir de este desplazamiento el buscador de la portada ya no se ve y la
+ * cabecera saca el suyo. Mientras los dos están en pantalla sólo mandaba uno,
+ * y tener dos campos idénticos a la vez confundía más que ayudaba.
+ */
+const SEARCH_FROM = 300;
+
 export function Header({ query, onQuery }: Props) {
-  const { setColorScheme } = useMantineColorScheme();
-  const scheme = useComputedColorScheme("light", {
-    getInitialValueInEffect: true,
-  });
   const [searchOpen, setSearchOpen] = useState(false);
   const [scroll] = useWindowScroll();
+  const items = useQuote();
+
+  const scrolledPastHero = scroll.y > SEARCH_FROM;
 
   // Con una búsqueda activa el campo permanece visible aunque no se haya desplegado
   // a mano, para que se vea qué se está filtrando.
@@ -46,7 +52,7 @@ export function Header({ query, onQuery }: Props) {
 
   /** Atajos de teclado habituales en un buscador: «/» y Ctrl/Cmd+K. */
   const focusSearch = () => {
-    if (wideSearch) deskRef.current?.focus();
+    if (wideSearch && scrolledPastHero) deskRef.current?.focus();
     else setSearchOpen(true);
   };
   useHotkeys([
@@ -71,7 +77,7 @@ export function Header({ query, onQuery }: Props) {
     <TextInput
       className={className}
       ref={ref}
-      placeholder="Buscar producto, material o uso…"
+      placeholder="Buscar producto, material o medida…"
       value={query}
       onChange={(e) => onQuery(e.currentTarget.value)}
       leftSection={<IconSearch size={16} />}
@@ -111,7 +117,14 @@ export function Header({ query, onQuery }: Props) {
             />
           </a>
 
-          {searchInput(deskRef, classes.search)}
+          {/* El campo ancho aparece cuando el de la portada deja de verse. */}
+          <Box
+            className={classes.search}
+            data-visible={(scrolledPastHero || query !== "") || undefined}
+            aria-hidden={!scrolledPastHero && query === ""}
+          >
+            {searchInput(deskRef)}
+          </Box>
 
           <Group gap="xs" wrap="nowrap">
             <ActionIcon
@@ -128,43 +141,61 @@ export function Header({ query, onQuery }: Props) {
               <IconSearch size={18} />
             </ActionIcon>
 
-            <Tooltip label={scheme === "dark" ? "Modo claro" : "Modo oscuro"}>
+            {/* Teléfono: en pantallas grandes con el número, en pequeñas sólo el icono. */}
+            <Tooltip label={`Llamar al ${COMPANY.phone}`}>
               <ActionIcon
+                className={classes.phoneIcon}
+                component="a"
+                href={`tel:+${COMPANY.phoneRaw}`}
                 variant="default"
                 size="lg"
                 radius="xl"
-                aria-label="Cambiar tema"
-                onClick={() =>
-                  setColorScheme(scheme === "dark" ? "light" : "dark")
-                }
+                aria-label={`Llamar al ${COMPANY.phone}`}
               >
-                {scheme === "dark" ? (
-                  <IconSun size={18} />
-                ) : (
-                  <IconMoon size={18} />
-                )}
+                <IconPhone size={18} />
               </ActionIcon>
             </Tooltip>
-
             <Button
               className={classes.phoneFull}
               component="a"
               href={`tel:+${COMPANY.phoneRaw}`}
+              variant="default"
               leftSection={<IconPhone size={18} />}
             >
               {COMPANY.phone}
             </Button>
-            <ActionIcon
-              className={classes.phoneIcon}
-              component="a"
-              href={`tel:+${COMPANY.phoneRaw}`}
-              variant="filled"
-              size="lg"
-              radius="xl"
-              aria-label={`Llamar al ${COMPANY.phone}`}
+
+            {/*
+              La acción principal de toda la web vive ahora en la cabecera, en
+              lugar del conmutador de tema que ocupaba este sitio: a un comprador
+              industrial le sirve de más un botón de presupuesto que el modo
+              oscuro, que sigue funcionando solo según la preferencia del sistema.
+            */}
+            <Indicator
+              label={items.length}
+              size={18}
+              disabled={items.length === 0}
+              color="accent"
+              offset={4}
             >
-              <IconPhone size={18} />
-            </ActionIcon>
+              <Button
+                onClick={() => openQuoteForm()}
+                leftSection={<IconSend size={18} />}
+                className={classes.quoteFull}
+              >
+                {items.length > 0 ? "Mi solicitud" : "Presupuesto"}
+              </Button>
+              <ActionIcon
+                onClick={() => openQuoteForm()}
+                variant="filled"
+                size="lg"
+                radius="xl"
+                className={classes.quoteIcon}
+                aria-label="Solicitar presupuesto"
+              >
+                <IconSend size={18} />
+              </ActionIcon>
+            </Indicator>
           </Group>
         </Group>
 

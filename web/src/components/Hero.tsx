@@ -10,32 +10,30 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { IconArrowDown, IconMail, IconSearch } from '@tabler/icons-react';
-import { categories, type CategoryId } from '../data/catalog';
+import { IconArrowDown, IconSearch, IconSend } from '@tabler/icons-react';
+import { COMPANY, HIGHLIGHTS } from '../data/catalog';
+import { openQuoteForm } from '../hooks/useQuote';
 import classes from './Hero.module.css';
 
 interface Props {
   query: string;
   onQuery: (v: string) => void;
-  onActive: (v: CategoryId | 'all') => void;
 }
 
 const goToCatalog = () =>
   document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
 
-export function Hero({ query, onQuery, onActive }: Props) {
-  const stats = [
-    { value: categories.length, label: 'familias de producto' },
-    { value: 'CE', label: 'certificado en todos los productos' },
-  ];
-
+export function Hero({ query, onQuery }: Props) {
   return (
     <Box component="section" id="inicio" className={classes.hero}>
       <div className={classes.overlay} />
       <Container size="xl" className={classes.inner}>
         <Stack gap="lg" maw={760}>
+          {/* La provincia va arriba del todo: «envase y embalaje en Zaragoza» es
+              lo que se busca, y quien entra necesita saber en dos segundos si
+              le cae cerca. */}
           <Badge size="lg" radius="xl" className={classes.year}>
-            Catálogo general
+            Distribuidor en {COMPANY.province}
           </Badge>
 
           <Title order={1} c="white">
@@ -44,14 +42,15 @@ export function Hero({ query, onQuery, onActive }: Props) {
 
           <Text size="lg" className={classes.lead}>
             Precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria.
-            Consulta la ficha técnica de cada producto y pídenos presupuesto sin compromiso.
+            Consulte la ficha técnica de cada producto y pídanos presupuesto sin
+            compromiso.
           </Text>
 
           <TextInput
             size="md"
             radius="xl"
             className={classes.search}
-            placeholder="Buscar producto, material o uso…"
+            placeholder="Buscar producto, material o medida…"
             value={query}
             onChange={(e) => onQuery(e.currentTarget.value)}
             leftSection={<IconSearch size={18} />}
@@ -79,36 +78,22 @@ export function Hero({ query, onQuery, onActive }: Props) {
               radius="xl"
               variant="outline"
               className={classes.ghost}
-              leftSection={<IconMail size={16} />}
-              component="a"
-              href="#contacto"
+              leftSection={<IconSend size={16} />}
+              onClick={() => openQuoteForm()}
             >
               Pedir presupuesto
             </Button>
           </Group>
 
-          {/* Accesos directos a cada familia, en un tono discreto para que no
-              compitan con los dos botones principales. */}
-          <Group gap={8} wrap="nowrap" className={classes.quick}>
-            {categories.map((c) => (
-              <Button
-                key={c.id}
-                size="compact-sm"
-                radius="xl"
-                variant="default"
-                className={classes.quickBtn}
-                onClick={() => {
-                  onActive(c.id);
-                  goToCatalog();
-                }}
-              >
-                {c.name}
-              </Button>
-            ))}
-          </Group>
-
+          {/*
+            Motivos de compra, no recuentos. Antes aquí ponía «9 familias de
+            producto» y «CE», que no son razones para elegir a nadie: el catálogo
+            ya se ve entero unos centímetros más abajo. Los accesos por familia
+            que había en esta misma zona se han quitado porque repetían, uno por
+            uno, los filtros del catálogo.
+          */}
           <Group gap="clamp(1.5rem, 5vw, 3.5rem)" className={classes.stats}>
-            {stats.map((s) => (
+            {HIGHLIGHTS.map((s) => (
               <Box key={s.label} className={classes.stat}>
                 <Text className={classes.statValue}>{s.value}</Text>
                 <Text className={classes.statLabel}>{s.label}</Text>
