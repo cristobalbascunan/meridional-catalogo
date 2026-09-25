@@ -1,0 +1,26 @@
+/* Botón de quitar dentro de la etiqueta del producto. */
+.remove {
+  all: unset;
+  cursor: pointer;
+  padding-inline: 4px;
+  line-height: 1;
+  font-size: 15px;
+  opacity: 0.65;
+}
+
+.remove:hover,
+.remove:focus-visible {
+  opacity: 1;
+}
+
+/*
+ * Trampa para robots. `display: none` la saltan muchos: se esconde fuera de la
+ * pantalla para que siga siendo un campo real y rellenable por un script.
+ */
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

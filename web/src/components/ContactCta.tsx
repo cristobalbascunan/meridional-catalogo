@@ -1,6 +1,8 @@
 import { Box, Button, Container, Group, Stack, Text, Title } from '@mantine/core';
-import { IconMail, IconMapPin, IconPhone } from '@tabler/icons-react';
+import { IconMapPin, IconPhone, IconSend } from '@tabler/icons-react';
 import { COMPANY } from '../data/catalog';
+import { openQuoteForm } from '../hooks/useQuote';
+import { WhatsAppButton } from './WhatsAppButton';
 import classes from './ContactCta.module.css';
 
 /**
@@ -28,17 +30,20 @@ export function ContactCta() {
             </Group>
           </Stack>
 
+          {/*
+            El botón principal abre el formulario en vez de un `mailto:`, que en
+            un ordenador sin cliente de correo configurado no hacía nada.
+          */}
           <Group gap="sm">
             <Button
               size="md"
               radius="xl"
               variant="white"
               color="dark"
-              component="a"
-              href={`mailto:${COMPANY.email}`}
-              leftSection={<IconMail size={18} />}
+              leftSection={<IconSend size={18} />}
+              onClick={() => openQuoteForm()}
             >
-              {COMPANY.email}
+              Solicitar presupuesto
             </Button>
             <Button
               size="md"
@@ -51,6 +56,7 @@ export function ContactCta() {
             >
               {COMPANY.phone}
             </Button>
+            <WhatsAppButton size="md" radius="xl" variant="outline" className={classes.ghost} />
           </Group>
         </Group>
       </Container>

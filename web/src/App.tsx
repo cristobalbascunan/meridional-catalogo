@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   Affix,
   Badge,
   Box,
   Button,
-  Chip,
   Container,
+  Drawer,
   Group,
-  Pill,
+  Indicator,
   SimpleGrid,
   Stack,
   Text,
@@ -16,19 +16,27 @@ import {
   VisuallyHidden,
   rem,
 } from '@mantine/core';
-import { useWindowScroll } from '@mantine/hooks';
-import { IconArrowUp, IconFilterOff, IconMoodEmpty } from '@tabler/icons-react';
+import { useDisclosure, useWindowScroll } from '@mantine/hooks';
+import {
+  IconAdjustmentsHorizontal,
+  IconArrowUp,
+  IconMoodEmpty,
+  IconSend,
+} from '@tabler/icons-react';
 import { useViewTransition } from './hooks/useViewTransition';
+import { homePath, navigate, productPath, useRoute } from './hooks/useRoute';
+import { openQuoteForm, useQuote } from './hooks/useQuote';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Footer } from './components/Footer';
 import { ContactCta } from './components/ContactCta';
+import { Filters } from './components/Filters';
 import { ProductCard } from './components/ProductCard';
 import { ProductDrawer } from './components/ProductDrawer';
+import { QuoteModal } from './components/QuoteModal';
 import {
   TAGS,
   categories,
-  categoryById,
   products,
   type CategoryId,
   type Product,
@@ -41,7 +49,7 @@ const norm = (s: string) =>
   s
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .replace(/[̀-ͯ]/g, '');
 
 /** Texto sobre el que busca el buscador: nombre, familia, resumen, specs, variantes y etiquetas. */
 const haystack = (p: Product) =>
@@ -49,19 +57,16 @@ const haystack = (p: Product) =>
     [p.name, p.family, p.summary, ...p.specs, ...(p.variants ?? []), ...p.tags].join(' '),
   );
 
-/** Ficha enlazada en la URL, del tipo `#p/precinto-impreso`. */
-const productFromHash = (): Product | null => {
-  const m = /^#p\/(.+)$/.exec(window.location.hash);
-  if (!m) return null;
-  return products.find((p) => p.id === decodeURIComponent(m[1])) ?? null;
-};
-
 export default function App() {
   const [query, setQuery] = useState('');
   const [active, setActive] = useState<CategoryId | 'all'>('all');
   const [tags, setTags] = useState<Tag[]>([]);
-  const [detail, setDetail] = useState<Product | null>(null);
   const [scroll, scrollTo] = useWindowScroll();
+  const [filtersOpen, filtersCtl] = useDisclosure(false);
+
+  const route = useRoute();
+  const quoteItems = useQuote();
+  const detail = route.name === 'product' ? products.find((p) => p.id === route.id) ?? null : null;
 
   const startTransition = useViewTransition();
 
@@ -110,10 +115,13 @@ export default function App() {
   }, [base]);
 
   const isFiltering = active !== 'all' || tags.length > 0 || query.trim() !== '';
+  /** Criterios activos, para el contador del botón de filtros del móvil. */
+  const activeCount = (active !== 'all' ? 1 : 0) + tags.length + (query.trim() !== '' ? 1 : 0);
 
   // Cambiar de categoría sí se anima; escribir en el buscador no, porque una
   // transición por cada pulsación se vería a trompicones.
   const changeCategory = (v: CategoryId | 'all') => startTransition(() => setActive(v));
+  const changeTags = (v: Tag[]) => startTransition(() => setTags(v));
 
   /**
    * Al empezar a buscar hay que ver los resultados. El buscador principal está en
@@ -140,17 +148,17 @@ export default function App() {
       setTags([]);
     });
 
-  /* ------------------------------------------------- Ficha enlazable por URL */
+  /* ------------------------------------------------ Ficha con dirección propia */
 
   // Abrir una ficha añade una entrada al historial: el botón «atrás» del móvil
-  // la cierra, y el enlace `#p/<id>` se le puede pasar a un cliente tal cual.
-  // `pushed` distingue esa entrada nuestra de la de quien llega directamente
-  // desde un enlace compartido: a ese, un `history.back()` lo sacaría de la web.
+  // la cierra, y la dirección `/producto/<id>` se le puede pasar a un cliente
+  // tal cual. `pushed` distingue esa entrada nuestra de la de quien llega
+  // directamente desde un enlace compartido: a ese, un `history.back()` lo
+  // sacaría de la web.
   const pushed = useRef(false);
 
   const openDetail = useCallback((p: Product) => {
-    setDetail(p);
-    window.history.pushState(null, '', `#p/${p.id}`);
+    navigate(productPath(p));
     pushed.current = true;
   }, []);
 
@@ -160,29 +168,21 @@ export default function App() {
       window.history.back();
       return;
     }
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    setDetail(null);
+    navigate(homePath, { replace: true });
   }, []);
 
-  useEffect(() => {
-    const sync = () => {
-      const p = productFromHash();
-      if (!p) pushed.current = false;
-      setDetail(p);
-    };
-    sync();
-    window.addEventListener('popstate', sync);
-    window.addEventListener('hashchange', sync);
-    return () => {
-      window.removeEventListener('popstate', sync);
-      window.removeEventListener('hashchange', sync);
-    };
-  }, []);
-
-  const catChips: { id: CategoryId | 'all'; label: string }[] = [
-    { id: 'all', label: 'Todo el catálogo' },
-    ...categories.map((c) => ({ id: c.id, label: c.name })),
-  ];
+  const filterProps = {
+    active,
+    tags,
+    query,
+    categoryCounts,
+    tagCounts,
+    isFiltering,
+    onCategory: changeCategory,
+    onTags: changeTags,
+    onQuery: setQuery,
+    onReset: reset,
+  };
 
   const grid = (list: Product[], showCategory = false) => (
     <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 4 }} spacing="md" verticalSpacing="md">
@@ -205,110 +205,59 @@ export default function App() {
 
       <Header query={query} onQuery={handleQuery} />
 
-      <Hero query={query} onQuery={handleQuery} onActive={changeCategory} />
+      <Hero query={query} onQuery={handleQuery} />
 
       <Container size="xl" py="xl" id="catalogo" component="main" tabIndex={-1}>
         <Stack gap="xl">
-          {/* Barra de filtros */}
+          {/* Barra de filtros completa: sólo a partir de tableta. */}
           <Box className={classes.toolbar}>
-            <Box>
-              <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={8}>
-                Categoría
-              </Text>
-              <Group gap={8} className={classes.filterRow} wrap="nowrap">
-                {catChips.map((c) => (
-                  <Chip
-                    key={c.id}
-                    checked={active === c.id}
-                    onChange={() => changeCategory(c.id)}
-                    variant="outline"
-                    radius="xl"
-                    size="sm"
-                    disabled={categoryCounts[c.id] === 0 && active !== c.id}
-                  >
-                    {c.label}{' '}
-                    <Text span c="dimmed" fz="xs">
-                      {categoryCounts[c.id]}
-                    </Text>
-                  </Chip>
-                ))}
-              </Group>
-            </Box>
-
-            <Group justify="space-between" align="flex-end" gap="md" mt="md">
-              <Box>
-                <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={8}>
-                  Característica
-                </Text>
-                <Chip.Group
-                  multiple
-                  value={tags}
-                  onChange={(v) => startTransition(() => setTags(v as Tag[]))}
-                >
-                  <Group gap={8} className={classes.filterRow} wrap="nowrap">
-                    {TAGS.map((t) => (
-                      <Chip
-                        key={t}
-                        value={t}
-                        variant="outline"
-                        radius="xl"
-                        size="sm"
-                        disabled={tagCounts[t] === 0 && !tags.includes(t)}
-                      >
-                        {t}{' '}
-                        <Text span c="dimmed" fz="xs">
-                          {tagCounts[t]}
-                        </Text>
-                      </Chip>
-                    ))}
-                  </Group>
-                </Chip.Group>
-              </Box>
-
-              {isFiltering && (
-                <Button
-                  variant="subtle"
-                  color="gray"
-                  size="compact-sm"
-                  leftSection={<IconFilterOff size={16} />}
-                  onClick={reset}
-                >
-                  Quitar filtros
-                </Button>
-              )}
-            </Group>
-
-            {/* Resumen de lo aplicado: se ve de un vistazo por qué la lista está
-                recortada, y cada criterio se puede quitar por separado. */}
-            {isFiltering && (
-              <Group gap={6} mt="sm">
-                <Text size="xs" c="dimmed" fw={600}>
-                  Filtros activos:
-                </Text>
-                {active !== 'all' && (
-                  <Pill withRemoveButton onRemove={() => changeCategory('all')}>
-                    {categoryById(active).name}
-                  </Pill>
-                )}
-                {query.trim() !== '' && (
-                  <Pill withRemoveButton onRemove={() => setQuery('')}>
-                    «{query.trim()}»
-                  </Pill>
-                )}
-                {tags.map((t) => (
-                  <Pill
-                    key={t}
-                    withRemoveButton
-                    onRemove={() =>
-                      startTransition(() => setTags((prev) => prev.filter((x) => x !== t)))
-                    }
-                  >
-                    {t}
-                  </Pill>
-                ))}
-              </Group>
-            )}
+            <Filters {...filterProps} />
           </Box>
+
+          {/*
+            En el móvil la barra entera ocupaba dos tercios de la pantalla, así
+            que se dejaba quieta y había que volver arriba para cambiar de
+            categoría — justo donde más falta hace. Ahora se queda pegada una
+            sola línea y los filtros se abren en un panel.
+          */}
+          <Box className={classes.mobileBar}>
+            <Indicator label={activeCount} size={18} disabled={activeCount === 0} offset={6}>
+              <Button
+                variant="default"
+                radius="xl"
+                leftSection={<IconAdjustmentsHorizontal size={18} />}
+                onClick={filtersCtl.open}
+              >
+                Filtros
+              </Button>
+            </Indicator>
+            <Text size="sm" c="dimmed">
+              {filtered.length} {filtered.length === 1 ? 'producto' : 'productos'}
+            </Text>
+          </Box>
+
+          <Drawer
+            opened={filtersOpen}
+            onClose={filtersCtl.close}
+            position="bottom"
+            size="auto"
+            radius="lg"
+            title={
+              <Text fw={700}>
+                Filtrar catálogo{' '}
+                <Text span c="dimmed" fw={400}>
+                  ({filtered.length})
+                </Text>
+              </Text>
+            }
+          >
+            <Box pb="md">
+              <Filters {...filterProps} stacked />
+              <Button fullWidth mt="md" size="md" onClick={filtersCtl.close}>
+                Ver {filtered.length} {filtered.length === 1 ? 'producto' : 'productos'}
+              </Button>
+            </Box>
+          </Drawer>
 
           {/* Recuento anunciado a los lectores de pantalla al cambiar los filtros. */}
           <VisuallyHidden aria-live="polite">
@@ -336,8 +285,8 @@ export default function App() {
                   <IconMoodEmpty size={40} stroke={1.5} />
                   <Text fw={600}>No hemos encontrado productos con esos criterios</Text>
                   <Text size="sm" ta="center" maw={420}>
-                    Prueba con otro término o quita algún filtro. Si buscas algo concreto,
-                    escríbenos y lo consultamos.
+                    Pruebe con otro término o quite algún filtro. Si busca algo concreto,
+                    escríbanos y se lo consultamos.
                   </Text>
                   <Button variant="light" onClick={reset} mt="xs">
                     Ver todo el catálogo
@@ -382,23 +331,49 @@ export default function App() {
 
       <ProductDrawer product={detail} opened={detail !== null} onClose={closeDetail} />
 
+      <QuoteModal />
+
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
-        <Transition
-          transition="slide-up"
-          mounted={scroll.y > 600 && detail === null}
-        >
-          {(styles) => (
-            <Button
-              style={styles}
-              variant="default"
-              radius="xl"
-              leftSection={<IconArrowUp size={16} />}
-              onClick={() => scrollTo({ y: 0 })}
-            >
-              Arriba
-            </Button>
-          )}
-        </Transition>
+        <Group gap="xs">
+          <Transition
+            transition="slide-up"
+            mounted={scroll.y > 600 && detail === null && !filtersOpen}
+          >
+            {(styles) => (
+              <Button
+                style={styles}
+                variant="default"
+                radius="xl"
+                leftSection={<IconArrowUp size={16} />}
+                onClick={() => scrollTo({ y: 0 })}
+              >
+                Arriba
+              </Button>
+            )}
+          </Transition>
+
+          {/*
+            Con productos apuntados, el botón de enviar la solicitud acompaña
+            durante todo el recorrido del catálogo: si hay que bajar hasta el
+            final para encontrar cómo pedir presupuesto, no se pide.
+          */}
+          <Transition
+            transition="slide-up"
+            mounted={quoteItems.length > 0 && detail === null && !filtersOpen}
+          >
+            {(styles) => (
+              <Button
+                style={styles}
+                radius="xl"
+                size="md"
+                leftSection={<IconSend size={18} />}
+                onClick={() => openQuoteForm()}
+              >
+                Pedir presupuesto ({quoteItems.length})
+              </Button>
+            )}
+          </Transition>
+        </Group>
       </Affix>
     </>
   );

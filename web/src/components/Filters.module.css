@@ -1,0 +1,29 @@
+/* En la barra de escritorio los filtros se reparten en varias líneas. */
+.filterRow {
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  scroll-snap-type: x proximity;
+}
+
+.filterRow::-webkit-scrollbar {
+  display: none;
+}
+
+.filterRow > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 48em) {
+  .filterRow {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+/* Dentro del panel del móvil hay sitio de sobra: los filtros se ven todos a la
+   vez en lugar de esconderse en un desplazamiento horizontal. */
+.filterWrap {
+  flex-wrap: wrap;
+}

@@ -6,10 +6,15 @@
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
-    <title>Meridional Plastic — Envase y embalaje</title>
+    <!--
+      El título y la descripción de aquí son los de la portada. `scripts/prerender.mjs`
+      los reescribe en cada ficha al compilar, así que conviene dejarlos en una
+      sola línea y con este formato para que los reemplace sin fallar.
+    -->
+    <title>Envase y embalaje en Zaragoza — Meridional Plastic</title>
     <meta
       name="description"
-      content="Catálogo de productos para envase y embalaje de Meridional Plastic, S.L.: precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria de envolver."
+      content="Precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria de envolver. Catálogo con ficha técnica y presupuesto sin compromiso en La Puebla de Alfindén, Zaragoza."
     />
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Meridional Plastic, S.L." />
@@ -17,17 +22,17 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Meridional Plastic" />
-    <meta property="og:title" content="Meridional Plastic — Envase y embalaje" />
+    <meta property="og:title" content="Envase y embalaje en Zaragoza — Meridional Plastic" />
     <meta
       property="og:description"
-      content="Productos para envase y embalaje: precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria."
+      content="Precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria de envolver. Catálogo con ficha técnica y presupuesto sin compromiso."
     />
     <!--
-      Ojo: al compilar con base relativa esta ruta queda como `./img/…`. Las redes
-      sociales necesitan una URL absoluta para poder descargar la imagen, así que
-      cuando el sitio tenga dominio definitivo hay que ponerla completa aquí.
+      Las redes sociales necesitan una dirección absoluta para poder descargar la
+      imagen. El pregenerado la completa con el dominio de `SITE_URL`, en
+      src/data/catalog.ts, tanto aquí como en cada ficha.
     -->
-    <meta property="og:image" content="/img/hero-tapes.jpg" />
+    <meta property="og:image" content="https://www.meridionalplastic.com/img/hero-tapes.jpg" />
     <meta property="og:image:alt" content="Bobinas de precinto de Meridional Plastic" />
     <meta property="og:locale" content="es_ES" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -42,34 +47,24 @@
          va referenciado desde el CSS, así que sin esto se pide tarde. -->
     <link rel="preload" as="image" href="/img/hero-tapes.jpg" fetchpriority="high" />
 
-    <!-- Datos de la empresa para buscadores. Deben coincidir con COMPANY en
-         src/data/catalog.ts. -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Meridional Plastic, S.L.",
-        "description": "Distribución de material de envase y embalaje para industria y comercio.",
-        "email": "info@meridionalplastic.com",
-        "telephone": "+34976158711",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Pol. Ind. Malpica Alfindén, Calle F, Nave 14",
-          "postalCode": "50171",
-          "addressLocality": "La Puebla de Alfindén",
-          "addressRegion": "Zaragoza",
-          "addressCountry": "ES"
-        }
-      }
-    </script>
+    <!--
+      Los datos estructurados (Organization en la portada y Product en cada
+      ficha) los inyecta `scripts/prerender.mjs` al compilar, para que cada
+      página lleve los suyos.
+    -->
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      Con el pregenerado, sin JavaScript se sigue leyendo el catálogo entero y
+      cada ficha: lo que se pierde es el buscador, los filtros y el formulario.
+    -->
     <noscript>
-      <p style="font-family: sans-serif; padding: 2rem">
-        Este catálogo necesita JavaScript. Si no puedes activarlo, escríbenos a
-        <a href="mailto:info@meridionalplastic.com">info@meridionalplastic.com</a> o llama al
-        <a href="tel:+34976158711">976 158 711</a> y te lo enviamos en PDF.
+      <p style="font-family: sans-serif; padding: 1rem 2rem; margin: 0">
+        Con JavaScript desactivado puede consultar el catálogo y las fichas, pero no
+        el buscador ni los filtros. Para pedir presupuesto, escríbanos a
+        <a href="mailto:info@meridionalplastic.com">info@meridionalplastic.com</a> o llame al
+        <a href="tel:+34976158711">976 158 711</a>.
       </p>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>

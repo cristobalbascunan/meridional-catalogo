@@ -37,40 +37,42 @@
   padding: var(--mantine-spacing-md);
 }
 
-/* En móvil la barra ocupa dos filas: pegarla dejaría media pantalla de filtros,
-   así que ahí se queda quieta y se recorre con el resto de la página. */
+/*
+ * En el móvil la barra completa ocupaba dos tercios de la pantalla, así que
+ * antes se desactivaba el pegado y había que subir del todo para cambiar de
+ * categoría. Ahora se sustituye por `.mobileBar`, una sola línea pegada que
+ * abre los mismos filtros en un panel.
+ */
 @media (max-width: 48em) {
   .toolbar {
-    position: static;
-    backdrop-filter: none;
+    display: none;
+  }
+}
+
+/* --------------------------------------------- Barra de filtros del móvil */
+
+.mobileBar {
+  display: none;
+  position: sticky;
+  top: var(--mp-header-h);
+  z-index: 100;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mantine-spacing-sm);
+  padding: 8px 12px;
+  border: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
+  border-radius: var(--mantine-radius-xl);
+  background: light-dark(rgba(248, 249, 250, 0.94), rgba(37, 38, 43, 0.94));
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 48em) {
+  .mobileBar {
+    display: flex;
   }
 }
 
 /* Zona que se funde al cambiar de categoría o de filtro. */
 .results {
   view-transition-name: catalogo;
-}
-
-/* En móvil los filtros se desplazan en horizontal en vez de ocupar tres líneas. */
-.filterRow {
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 2px;
-  scroll-snap-type: x proximity;
-}
-
-.filterRow::-webkit-scrollbar {
-  display: none;
-}
-
-.filterRow > * {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-}
-
-@media (min-width: 48em) {
-  .filterRow {
-    flex-wrap: wrap;
-    overflow-x: visible;
-  }
 }

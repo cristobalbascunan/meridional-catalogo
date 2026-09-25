@@ -39,9 +39,24 @@
   }
 }
 
+/*
+ * Buscador de la cabecera: existe siempre, pero sólo se ve una vez que el de la
+ * portada ha salido de pantalla. Se oculta con opacidad y no con `display` para
+ * que la transición tenga de dónde partir.
+ */
 .search {
   flex: 1;
   max-width: 520px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 180ms ease,
+    visibility 180ms;
+}
+
+.search[data-visible] {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* En pantallas pequeñas la búsqueda se despliega bajo un botón para ahorrar espacio. */
@@ -75,11 +90,30 @@
   display: none;
 }
 
-@media (max-width: 48em) {
+.quoteFull {
+  display: inline-flex;
+}
+
+.quoteIcon {
+  display: none;
+}
+
+/* Con poco ancho el teléfono y el presupuesto se quedan en icono: el logotipo y
+   el botón de buscar ya llenan la fila. */
+@media (max-width: 62em) {
   .phoneFull {
     display: none;
   }
   .phoneIcon {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 36em) {
+  .quoteFull {
+    display: none;
+  }
+  .quoteIcon {
     display: inline-flex;
   }
 }
