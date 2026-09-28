@@ -123,15 +123,29 @@ const render = ({ title, description, canonical, image, imageAlt, jsonLd, body }
 const FALLBACK_CSS = `
   .mp-static{max-width:1100px;margin:0 auto;padding:24px 16px 64px;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.55;color:#1a1b1e}
   .mp-static a{color:#0d6dff}
-  .mp-static h1{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.15;margin:.2em 0}
-  .mp-static h2{font-size:1.35rem;margin:1.6em 0 .4em;border-bottom:1px solid #e9ecef;padding-bottom:.3em}
-  .mp-static h3{font-size:1rem;margin:.2em 0}
+  .mp-static h1{font-size:clamp(2rem,5vw,3.25rem);font-weight:800;line-height:1.1;margin:.2em 0}
+  .mp-static h2{font-size:clamp(1.5rem,3.2vw,2.125rem);font-weight:800;margin:1.6em 0 .4em;border-bottom:1px solid #e9ecef;padding-bottom:.3em}
+  .mp-static h3{font-size:1rem;font-weight:700;margin:0;line-height:1.25}
   .mp-static ul{padding-left:1.2em}
-  .mp-static .mp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;list-style:none;padding:0}
-  .mp-static .mp-grid li{border:1px solid #e9ecef;border-radius:10px;padding:12px}
   .mp-static .mp-muted{color:#666}
   .mp-static .mp-lead{font-size:1.1rem;color:#444;max-width:62ch}
   .mp-static img{max-width:100%;height:auto;border-radius:8px}
+
+  /*
+   * El grid y la tarjeta reproducen el aspecto de <ProductCard> (ver
+   * src/components/ProductCard.module.css) a propósito: si se parecen, sea
+   * cual sea el tiempo que tarde en cargar el JavaScript, el cambio a la app
+   * real se nota como una mejora (aparecen las insignias, el hover, la
+   * animación) y no como un parpadeo a una página distinta.
+   */
+  .mp-static .mp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;list-style:none;padding:0}
+  .mp-static .mp-grid li{border:1px solid #e9ecef;border-radius:10px;overflow:hidden;background:#fff}
+  .mp-static .mp-grid a{display:flex;flex-direction:column;height:100%;color:inherit;text-decoration:none}
+  .mp-static .mp-grid .mp-photo{height:170px;box-sizing:border-box;padding:16px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid #e9ecef;color:#adb5bd;font-size:.8rem;text-align:center}
+  .mp-static .mp-grid .mp-photo img{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:0}
+  .mp-static .mp-grid .mp-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
+  .mp-static .mp-grid .mp-eyebrow{font-size:.72rem;font-weight:700;color:#868e96;text-transform:uppercase;letter-spacing:.02em}
+  .mp-static .mp-grid .mp-summary{font-size:.9rem;color:#666;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 `;
 
 const contactBlock = () => `
@@ -165,8 +179,18 @@ const homeBody = () =>
           .filter((p) => p.category === c.id)
           .map(
             (p) => `<li>
-              <h3><a href="${esc(base)}producto/${esc(p.id)}/">${esc(p.name)}</a></h3>
-              <p class="mp-muted">${esc(p.summary)}</p>
+              <a href="${esc(base)}producto/${esc(p.id)}/">
+                <div class="mp-photo">${
+                  p.image
+                    ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" decoding="async" />`
+                    : esc(p.family)
+                }</div>
+                <div class="mp-body">
+                  <div class="mp-eyebrow">${esc(p.family)}</div>
+                  <h3>${esc(p.name)}</h3>
+                  <div class="mp-summary">${esc(p.summary)}</div>
+                </div>
+              </a>
             </li>`,
           )
           .join('')}
