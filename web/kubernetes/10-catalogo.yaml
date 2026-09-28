@@ -1,0 +1,131 @@
+# Catálogo (sitio estático servido por nginx) para Kubernetes.
+#
+# Sin base de datos ni backend propio: cada réplica es intercambiable, así que
+# no lleva afinidad de sesión ni almacenamiento persistente, a diferencia del
+# frontend de app-facturacion.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogo
+  namespace: meridional-plastic
+  labels:
+    app: catalogo
+    tier: presentation
+spec:
+  replicas: 2 # Alta disponibilidad
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: catalogo
+  template:
+    metadata:
+      labels:
+        app: catalogo
+        tier: presentation
+    spec:
+      # Anti-affinity para distribuir los pods en distintos nodos.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - catalogo
+                topologyKey: kubernetes.io/hostname
+
+      containers:
+        - name: catalogo
+          image: cristobalseplac/meridional-catalogo:latest
+          imagePullPolicy: Always
+
+          securityContext:
+            runAsNonRoot: false # La imagen base nginx:alpine arranca como root para enlazar el puerto 80
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["CHOWN", "SETUID", "SETGID", "NET_BIND_SERVICE"]
+
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "25m"
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalogo-service
+  namespace: meridional-plastic
+  labels:
+    app: catalogo
+spec:
+  selector:
+    app: catalogo
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  type: ClusterIP
+
+---
+# Autoescalado opcional: el sitio es estático y barato de servir, así que dos
+# réplicas fijas bastan casi siempre. Sube maxReplicas sin miedo si hay picos.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: catalogo-hpa
+  namespace: meridional-plastic
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: catalogo
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

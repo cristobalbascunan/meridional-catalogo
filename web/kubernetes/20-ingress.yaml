@@ -1,0 +1,43 @@
+# Dominio canónico: meridionalplastic.com (sin www). El pregenerado
+# (scripts/prerender.mjs) ya genera las URL canónicas, el sitemap y el
+# og:image con ese dominio — si algún día se prefiere www como canónico, hay
+# que cambiar los dos sitios a la vez (VITE_SITE_URL y este host) o Google
+# verá URL canónicas que no coinciden con las que de verdad sirve el sitio.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalogo-ingress
+  namespace: meridional-plastic
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # www.meridionalplastic.com → meridionalplastic.com
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - meridionalplastic.com
+        - www.meridionalplastic.com
+      secretName: meridionalplastic-com-tls
+  rules:
+    - host: meridionalplastic.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: catalogo-service
+                port:
+                  number: 80
+    - host: www.meridionalplastic.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: catalogo-service
+                port:
+                  number: 80
