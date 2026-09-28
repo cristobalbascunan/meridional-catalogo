@@ -16,9 +16,10 @@ En el panel de IONOS: **Dominios y SSL → meridionalplastic.com → DNS**.
 | A | @ (dominio raíz) | `<IP del cluster>` | 3600 |
 | A | www | `<IP del cluster>` | 3600 |
 
-No hace falta CNAME para `www`: el Ingress ya redirige `www.meridionalplastic.com`
-a `meridionalplastic.com` (dominio canónico), así que basta con que las dos
-direcciones resuelvan a la misma IP.
+No hace falta CNAME para `www`: siguen haciendo falta los dos registros A de
+arriba (ambos apuntando a la misma IP), pero el dominio canónico es
+`www.meridionalplastic.com` — el Ingress redirige `meridionalplastic.com`
+(sin www) a la versión con www, al revés que en app-facturacion.
 
 ## Verificación
 
@@ -42,13 +43,17 @@ de app-facturacion, no hace falta tocar nada más.
 
 ```powershell
 kubectl get certificate -n meridional-plastic
-# NAME                        READY   SECRET                      AGE
-# meridionalplastic-com-tls   True    meridionalplastic-com-tls   ...
+# NAME                            READY   SECRET                          AGE
+# www-meridionalplastic-com-tls   True    www-meridionalplastic-com-tls   ...
+# meridionalplastic-com-tls       True    meridionalplastic-com-tls       ...
 ```
 
-Si se queda en `READY: False` más de 10 minutos:
+Son dos certificados porque son dos Ingress (uno sirve el sitio en www, el otro
+sólo redirige el dominio raíz). Si alguno se queda en `READY: False` más de 10
+minutos:
 
 ```powershell
+kubectl describe certificate www-meridionalplastic-com-tls -n meridional-plastic
 kubectl describe certificate meridionalplastic-com-tls -n meridional-plastic
 kubectl get challenges -n meridional-plastic
 ```

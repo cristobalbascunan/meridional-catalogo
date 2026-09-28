@@ -83,7 +83,7 @@ export const COMPANY = {
  * compilar con `VITE_SITE_URL` si el sitio se publica en otro dominio.
  */
 export const SITE_URL = (
-  import.meta.env.VITE_SITE_URL || "https://meridionalplastic.com"
+  import.meta.env.VITE_SITE_URL || "https://www.meridionalplastic.com"
 ).replace(/\/$/, "");
 
 /**

@@ -1,8 +1,17 @@
-# Dominio canónico: meridionalplastic.com (sin www). El pregenerado
+# Dominio canónico: www.meridionalplastic.com. El pregenerado
 # (scripts/prerender.mjs) ya genera las URL canónicas, el sitemap y el
-# og:image con ese dominio — si algún día se prefiere www como canónico, hay
-# que cambiar los dos sitios a la vez (VITE_SITE_URL y este host) o Google
-# verá URL canónicas que no coinciden con las que de verdad sirve el sitio.
+# og:image con ese dominio — si algún día se prefiere el dominio raíz como
+# canónico, hay que cambiar los dos sitios a la vez (VITE_SITE_URL y el host
+# de este Ingress) o Google verá URL canónicas que no coinciden con las que
+# de verdad sirve el sitio.
+#
+# `nginx.ingress.kubernetes.io/from-to-www-redirect` (la que usa
+# app-facturacion) sólo redirige en un sentido, www → dominio raíz; no hay
+# anotación equivalente para el sentido contrario. Por eso aquí hace falta un
+# segundo Ingress para el dominio raíz, con `permanent-redirect` en vez de
+# servir contenido: nginx corta la petición y redirige antes de llegar al
+# backend, así que el `catalogo-service` de abajo no se usa realmente, pero
+# hace falta declararlo porque un Ingress no puede quedarse sin backend.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -11,17 +20,14 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    # www.meridionalplastic.com → meridionalplastic.com
-    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - meridionalplastic.com
         - www.meridionalplastic.com
-      secretName: meridionalplastic-com-tls
+      secretName: www-meridionalplastic-com-tls
   rules:
-    - host: meridionalplastic.com
+    - host: www.meridionalplastic.com
       http:
         paths:
           - path: /
@@ -31,7 +37,26 @@ spec:
                 name: catalogo-service
                 port:
                   number: 80
-    - host: www.meridionalplastic.com
+
+---
+# meridionalplastic.com (sin www) → 301 a www.meridionalplastic.com
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalogo-ingress-apex-redirect
+  namespace: meridional-plastic
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/permanent-redirect: "https://www.meridionalplastic.com$request_uri"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - meridionalplastic.com
+      secretName: meridionalplastic-com-tls
+  rules:
+    - host: meridionalplastic.com
       http:
         paths:
           - path: /

@@ -17,7 +17,7 @@ COPY . .
 # o cambiar el endpoint del formulario basta con pasar el `--build-arg`
 # correspondiente al construir la imagen, sin tocar el código.
 ARG BASE_PATH=/
-ARG VITE_SITE_URL=https://meridionalplastic.com
+ARG VITE_SITE_URL=https://www.meridionalplastic.com
 ARG VITE_FORM_ENDPOINT=
 ENV BASE_PATH=$BASE_PATH
 ENV VITE_SITE_URL=$VITE_SITE_URL
