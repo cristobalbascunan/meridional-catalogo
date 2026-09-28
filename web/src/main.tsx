@@ -9,7 +9,9 @@ import { theme } from './theme';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <MantineProvider theme={theme} forceColorScheme="light">
-      <App />
+      <div className="mp-app-reveal">
+        <App />
+      </div>
     </MantineProvider>
   </StrictMode>,
 );

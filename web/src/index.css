@@ -31,6 +31,22 @@ body {
  * "reducir movimiento" en su sistema ve la web completamente estática.
  */
 @media (prefers-reduced-motion: no-preference) {
+  /*
+   * React sustituye de golpe el HTML estático del pregenerado (ver
+   * scripts/prerender.mjs) por la app: sin transición, ese cambio de una
+   * ficha plana a la interfaz real se nota como un parpadeo. Este fundido
+   * sólo corre una vez, al montar, sobre el contenedor que envuelve <App />.
+   */
+  .mp-app-reveal {
+    animation: mp-app-reveal 240ms ease both;
+  }
+
+  @keyframes mp-app-reveal {
+    from {
+      opacity: 0;
+    }
+  }
+
   /* Entrada del hero, escalonada. */
   .mp-rise {
     animation: mp-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
