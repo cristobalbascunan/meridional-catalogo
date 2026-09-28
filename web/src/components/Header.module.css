@@ -2,19 +2,16 @@
   position: sticky;
   top: 0;
   z-index: 200;
-  background: light-dark(rgba(255, 255, 255, 0.88), rgba(26, 27, 30, 0.88));
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-bottom: 1px solid var(--mantine-color-gray-3);
   transition: box-shadow 200ms ease;
 }
 
 /* Al separarse de lo alto de la página la cabecera proyecta sombra: deja claro
    que flota sobre el contenido en lugar de formar parte de él. */
 .header[data-scrolled] {
-  box-shadow: light-dark(
-    0 1px 3px rgba(15, 23, 42, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.45)
-  );
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
 .top {

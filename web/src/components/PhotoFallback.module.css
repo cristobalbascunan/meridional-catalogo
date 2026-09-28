@@ -9,15 +9,15 @@
      parecer un error de carga. */
   background-image: repeating-linear-gradient(
     135deg,
-    light-dark(var(--mantine-color-brand-0), rgba(13, 109, 255, 0.07)),
-    light-dark(var(--mantine-color-brand-0), rgba(13, 109, 255, 0.07)) 10px,
-    light-dark(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.02)) 10px,
-    light-dark(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.02)) 20px
+    var(--mantine-color-brand-0),
+    var(--mantine-color-brand-0) 10px,
+    rgba(255, 255, 255, 0.85) 10px,
+    rgba(255, 255, 255, 0.85) 20px
   );
 }
 
 .icon {
-  color: light-dark(var(--mantine-color-brand-4), var(--mantine-color-brand-5));
+  color: var(--mantine-color-brand-4);
 }
 
 .family {
@@ -25,7 +25,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: light-dark(var(--mantine-color-brand-7), var(--mantine-color-brand-3));
+  color: var(--mantine-color-brand-7);
   text-align: center;
   padding-inline: 12px;
 }

@@ -1,8 +1,8 @@
 /* Las fotos de producto están recortadas sobre blanco: mismo fondo que en la
    tarjeta para que no aparezca un recuadro claro dentro del panel oscuro. */
 .media {
-  background: light-dark(#fff, var(--mantine-color-dark-8));
-  border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
+  background: #fff;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
 }
 
 /*
@@ -18,7 +18,7 @@
   bottom: 0;
   z-index: 1;
   background: var(--mantine-color-body);
-  border-top: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-top: 1px solid var(--mantine-color-gray-3);
   padding: var(--mantine-spacing-md) var(--mantine-spacing-lg);
   padding-bottom: max(var(--mantine-spacing-md), env(safe-area-inset-bottom));
 }

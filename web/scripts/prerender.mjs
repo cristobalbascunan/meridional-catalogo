@@ -132,13 +132,6 @@ const FALLBACK_CSS = `
   .mp-static .mp-muted{color:#666}
   .mp-static .mp-lead{font-size:1.1rem;color:#444;max-width:62ch}
   .mp-static img{max-width:100%;height:auto;border-radius:8px}
-  @media (prefers-color-scheme:dark){
-    .mp-static{color:#c1c2c5}
-    .mp-static h2{border-color:#2c2e33}
-    .mp-static .mp-grid li{border-color:#2c2e33}
-    .mp-static .mp-muted{color:#909296}
-    .mp-static .mp-lead{color:#a6a7ab}
-  }
 `;
 
 const contactBlock = () => `
