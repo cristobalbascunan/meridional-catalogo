@@ -17,9 +17,11 @@ En el panel de IONOS: **Dominios y SSL → meridionalplastic.com → DNS**.
 | A | www | `<IP del cluster>` | 3600 |
 
 No hace falta CNAME para `www`: siguen haciendo falta los dos registros A de
-arriba (ambos apuntando a la misma IP), pero el dominio canónico es
-`www.meridionalplastic.com` — el Ingress redirige `meridionalplastic.com`
-(sin www) a la versión con www, al revés que en app-facturacion.
+arriba (ambos apuntando a la misma IP). El dominio canónico es
+`www.meridionalplastic.com`; `meridionalplastic.com` (sin www) redirige a esa
+versión conservando la ruta, pero la redirección la hace el propio nginx del
+contenedor, no el Ingress — el cluster no admite `permanent-redirect` con
+`$request_uri` ni snippets (ver el comentario en kubernetes/20-ingress.yaml).
 
 ## Verificación
 
@@ -43,17 +45,15 @@ de app-facturacion, no hace falta tocar nada más.
 
 ```powershell
 kubectl get certificate -n meridional-plastic
-# NAME                            READY   SECRET                          AGE
-# www-meridionalplastic-com-tls   True    www-meridionalplastic-com-tls   ...
-# meridionalplastic-com-tls       True    meridionalplastic-com-tls       ...
+# NAME                        READY   SECRET                      AGE
+# meridionalplastic-com-tls   True    meridionalplastic-com-tls   ...
 ```
 
-Son dos certificados porque son dos Ingress (uno sirve el sitio en www, el otro
-sólo redirige el dominio raíz). Si alguno se queda en `READY: False` más de 10
-minutos:
+Un único certificado cubre los dos nombres (www y sin www), porque hay un
+único Ingress con las dos entradas en `tls.hosts`. Si se queda en
+`READY: False` más de 10 minutos:
 
 ```powershell
-kubectl describe certificate www-meridionalplastic-com-tls -n meridional-plastic
 kubectl describe certificate meridionalplastic-com-tls -n meridional-plastic
 kubectl get challenges -n meridional-plastic
 ```
