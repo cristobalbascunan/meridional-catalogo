@@ -11,10 +11,10 @@
       los reescribe en cada ficha al compilar, así que conviene dejarlos en una
       sola línea y con este formato para que los reemplace sin fallar.
     -->
-    <title>Envase y embalaje en Zaragoza — Meridional Plastic</title>
+    <title>Envases y embalajes en Zaragoza | Meridional Plastic, S.L.</title>
     <meta
       name="description"
-      content="Precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria de envolver. Catálogo con ficha técnica y presupuesto sin compromiso en La Puebla de Alfindén, Zaragoza."
+      content="Precinto, film estirable, burbuja, fleje, cartón, palés y maquinaria de embalaje. Ficha técnica y presupuesto sin compromiso en Zaragoza."
     />
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Meridional Plastic, S.L." />
@@ -22,10 +22,10 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Meridional Plastic" />
-    <meta property="og:title" content="Envase y embalaje en Zaragoza — Meridional Plastic" />
+    <meta property="og:title" content="Envases y embalajes en Zaragoza | Meridional Plastic, S.L." />
     <meta
       property="og:description"
-      content="Precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria de envolver. Catálogo con ficha técnica y presupuesto sin compromiso."
+      content="Precinto, film estirable, burbuja, fleje, cartón, palés y maquinaria de embalaje. Ficha técnica y presupuesto sin compromiso en Zaragoza."
     />
     <!--
       Las redes sociales necesitan una dirección absoluta para poder descargar la
@@ -36,17 +36,38 @@
     <meta property="og:image:alt" content="Bobinas de precinto de Meridional Plastic" />
     <meta property="og:locale" content="es_ES" />
     <meta name="twitter:card" content="summary_large_image" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
     <!-- Fondo de la portada: es el elemento más grande de la primera pantalla y
          va referenciado desde el CSS, así que sin esto se pide tarde. -->
     <link rel="preload" as="image" href="/img/hero-tapes.jpg" fetchpriority="high" />
 
+    <!--
+      El pregenerado (scripts/prerender.mjs) pone el catálogo entero en #root para
+      los buscadores y para quien no tiene JavaScript. Verlo unos instantes y que
+      luego React lo sustituya por la interfaz real se notaba como un parpadeo de
+      HTML sin estilo. Se oculta hasta que React monta (que lo reemplaza); sigue en
+      el documento, así que los buscadores lo leen igual. Dos salvaguardas para no
+      dejar nunca la página en blanco: sin JavaScript (noscript) se muestra, y si
+      el script tardara más de 4 s —red muy lenta o error— reaparece solo.
+    -->
+    <style>
+      #root > .mp-static {
+        visibility: hidden;
+        animation: mp-static-show 0s 4s forwards;
+      }
+      @keyframes mp-static-show {
+        to {
+          visibility: visible;
+        }
+      }
+    </style>
+    <noscript>
+      <style>
+        #root > .mp-static {
+          visibility: visible;
+          animation: none;
+        }
+      </style>
+    </noscript>
     <!--
       Los datos estructurados (Organization en la portada y Product en cada
       ficha) los inyecta `scripts/prerender.mjs` al compilar, para que cada

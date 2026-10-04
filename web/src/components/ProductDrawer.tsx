@@ -12,22 +12,22 @@ import {
   Text,
   ThemeIcon,
   Title,
-} from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+} from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   IconCheck,
   IconCircleCheck,
   IconLink,
+  IconMail,
   IconPhone,
-  IconPlus,
-  IconSend,
-} from '@tabler/icons-react';
-import { COMPANY, categoryById, type Product } from '../data/catalog';
-import { absolute, productPath } from '../hooks/useRoute';
-import { openQuoteForm, quote, useQuote } from '../hooks/useQuote';
-import { PhotoFallback } from './PhotoFallback';
-import { WhatsAppButton } from './WhatsAppButton';
-import classes from './ProductDrawer.module.css';
+  IconPlus,
+} from "@tabler/icons-react";
+import { COMPANY, categoryById, type Product } from "../data/catalog";
+import { absolute, productPath } from "../hooks/useRoute";
+import { openQuoteForm, quote, useQuote } from "../hooks/useQuote";
+import { PhotoFallback } from "./PhotoFallback";
+import { WhatsAppButton } from "./WhatsAppButton";
+import classes from "./ProductDrawer.module.css";
 
 interface Props {
   product: Product | null;
@@ -36,23 +36,23 @@ interface Props {
 }
 
 export function ProductDrawer({ product, opened, onClose }: Props) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
+  const isMobile = useMediaQuery("(max-width: 48em)");
   const category = product ? categoryById(product.category) : null;
-  const inQuote = useQuote().includes(product?.id ?? '');
+  const inQuote = useQuote().includes(product?.id ?? "");
 
   const consulta = product
     ? `Buenos días, me gustaría recibir presupuesto de "${product.name}" del catálogo general.`
-    : '';
+    : "";
 
   // Enlace directo a esta ficha, para poder pasársela a un cliente o a un compañero.
-  const permalink = product ? absolute(productPath(product)) : '';
+  const permalink = product ? absolute(productPath(product)) : "";
 
   return (
     <Drawer
       opened={opened}
       onClose={onClose}
-      position={isMobile ? 'bottom' : 'right'}
-      size={isMobile ? '92%' : 520}
+      position={isMobile ? "bottom" : "right"}
+      size={isMobile ? "92%" : 520}
       padding={0}
       withCloseButton
       title={
@@ -60,7 +60,7 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
           {category?.name}
         </Text>
       }
-      styles={{ header: { paddingInline: 'var(--mantine-spacing-lg)' } }}
+      styles={{ header: { paddingInline: "var(--mantine-spacing-lg)" } }}
     >
       {product && (
         <>
@@ -71,10 +71,13 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
                   src={product.image}
                   alt={product.name}
                   fit="contain"
-                  h={product.imageSize === 'sm' ? 160 : 230}
+                  h={product.imageSize === "sm" ? 160 : 230}
                 />
               ) : (
-                <PhotoFallback product={product} h={product.imageSize === 'sm' ? 160 : 230} />
+                <PhotoFallback
+                  product={product}
+                  h={product.imageSize === "sm" ? 160 : 230}
+                />
               )}
             </Box>
 
@@ -135,8 +138,11 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
               <Divider my="xs" />
 
               <Text size="xs" c="dimmed">
-                Todos los productos disponen de características técnicas y certificados CE.
-                Referencia: <Text span ff="monospace">{product.id}</Text>
+                Todos los productos disponen de características técnicas y
+                certificados CE. Referencia:{" "}
+                <Text span ff="monospace">
+                  {product.id}
+                </Text>
               </Text>
             </Stack>
           </Stack>
@@ -150,19 +156,21 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
             <Group grow wrap="nowrap" gap="xs">
               <Button
                 size="md"
-                leftSection={<IconSend size={18} />}
+                leftSection={<IconMail size={18} />}
                 onClick={() => openQuoteForm(product.id)}
               >
                 Pedir presupuesto
               </Button>
               <Button
                 size="md"
-                variant={inQuote ? 'light' : 'default'}
-                color={inQuote ? 'teal' : undefined}
-                leftSection={inQuote ? <IconCheck size={18} /> : <IconPlus size={18} />}
+                variant={inQuote ? "light" : "default"}
+                color={inQuote ? "teal" : undefined}
+                leftSection={
+                  inQuote ? <IconCheck size={18} /> : <IconPlus size={18} />
+                }
                 onClick={() => quote.toggle(product.id)}
               >
-                {inQuote ? 'En mi solicitud' : 'Añadir a la solicitud'}
+                {inQuote ? "En mi solicitud" : "Añadir a la solicitud"}
               </Button>
             </Group>
 
@@ -186,10 +194,12 @@ export function ProductDrawer({ product, opened, onClose }: Props) {
                   size="compact-sm"
                   variant="subtle"
                   color="gray"
-                  leftSection={copied ? <IconCheck size={14} /> : <IconLink size={14} />}
+                  leftSection={
+                    copied ? <IconCheck size={14} /> : <IconLink size={14} />
+                  }
                   onClick={copy}
                 >
-                  {copied ? 'Enlace copiado' : 'Copiar enlace a esta ficha'}
+                  {copied ? "Enlace copiado" : "Copiar enlace a esta ficha"}
                 </Button>
               )}
             </CopyButton>

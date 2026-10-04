@@ -75,6 +75,15 @@ export const COMPANY = {
    * no se dibuja hasta que tenga valor (el fijo de arriba no sirve).
    */
   whatsapp: "",
+  /**
+   * Ficha de la empresa en Google Maps, para «Encuéntrenos en Google». Es una
+   * búsqueda por nombre y localidad, que abre la ficha de Google Business. Si
+   * el cliente facilita el enlace directo de su ficha (Compartir → Copiar
+   * enlace, del tipo https://maps.app.goo.gl/…), basta con pegarlo aquí.
+   */
+  googleMaps:
+    "https://www.google.com/maps/search/?api=1&query=" +
+    encodeURIComponent("Meridional Plastic La Puebla de Alfindén"),
 };
 
 /**
@@ -91,20 +100,32 @@ export const SITE_URL = (
  * propio catálogo respalda; plazos de entrega, años de actividad o zona de
  * reparto habrá que añadirlos aquí cuando el cliente los confirme.
  */
-export const HIGHLIGHTS = [
+export interface Highlight {
+  value: string;
+  label: string;
+  /** Sello que se dibuja junto al valor, en lugar de escribirlo. */
+  mark?: "ce";
+}
+
+export const HIGHLIGHTS: readonly Highlight[] = [
   {
-    value: "Su logotipo",
-    label: "Precinto impreso hasta 3 tintas y film hasta 4",
+    value: "Personalización total",
+    label:
+      "Todos nuestros productos pueden personalizarse según sus necesidades.",
   },
   {
     value: "A medida",
-    label: "Formatos y medidas fuera de catálogo",
+    label: "Fabricamos envases y embalajes adaptados a sus necesidades.",
   },
   {
-    value: "Certificado CE",
+    // Marcado CE confirmado por el cliente para todo el catálogo. Se dibuja el
+    // sello oficial al lado de la palabra: las letras «CE» en texto no se
+    // reconocen como marcado y, además, partían la línea en dos.
+    value: "Certificado",
+    mark: "ce",
     label: "Con ficha técnica en todos los productos",
   },
-] as const;
+];
 
 const rawCategories: Category[] = [
   {
@@ -319,8 +340,25 @@ const rawProducts: Product[] = [
       "Cajas de 54 bobinas",
       "Unión de pequeños paquetes y protección de superficies delicadas",
       "Metraje y peso verificado",
+      "Otros anchos y micrajes a medida, también con prestiro",
     ],
-    tags: ["Uso manual", "Uso automático"],
+    tags: ["Uso manual", "A medida"],
+  },
+  {
+    id: "minifilm-automatico",
+    name: "Minifilm · uso automático",
+    category: "film",
+    family: "Film estirable · uso automático",
+    image: "/img/minifilm.jpg",
+    summary:
+      "Minifilm en polietileno de baja densidad (PEBD) para paletizado automático, en anchos de 100, 166 y 250.",
+    specs: [
+      "Anchos 100, 166 y 250",
+      "Presentación en palé de 750 kg",
+      "Metraje y peso verificado",
+      "Otros anchos y micrajes a medida, también con prestiro",
+    ],
+    tags: ["Uso automático", "A medida"],
   },
   {
     id: "film-automatico",
@@ -589,7 +627,7 @@ const rawProducts: Product[] = [
     name: "Flejadora manual",
     category: "fleje",
     family: "Accesorios",
-    image: "/img/flejadora.jpg",
+    image: "/img/flejadora-manual.jpg",
     summary:
       "Herramienta robusta y de fácil uso para asegurar cargas de forma rápida y eficiente.",
     specs: [
@@ -603,6 +641,7 @@ const rawProducts: Product[] = [
     name: "Tensores",
     category: "fleje",
     family: "Accesorios",
+    image: "/img/tensores.jpg",
     summary:
       "El tensor manual permite tensar y cortar flejes de PP, PET, hot melt y composite de 19 a 25 mm.",
     specs: [
@@ -632,6 +671,7 @@ const rawProducts: Product[] = [
     name: "Mesa flejadora semiautomática",
     category: "fleje",
     family: "Accesorios",
+    image: "/img/mesa-flejadora.jpg",
     summary:
       "Mesa flejadora de alto rendimiento para flejes de polipropileno y poliéster.",
     specs: [
@@ -740,7 +780,7 @@ const rawProducts: Product[] = [
   },
   {
     id: "pales-segundo-uso",
-    name: "Palés de 2.º uso (ligero)",
+    name: "Palés de 2.º uso",
     category: "pales",
     family: "Palés",
     image: "/img/palets.jpg",

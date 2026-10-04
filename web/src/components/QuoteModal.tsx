@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from "react";
 import {
   Alert,
   Anchor,
@@ -14,19 +14,23 @@ import {
   Textarea,
   ThemeIcon,
   Title,
-} from '@mantine/core';
+} from "@mantine/core";
 import {
   IconAlertTriangle,
   IconCircleCheck,
   IconMail,
-  IconPhone,
-  IconSend,
+  IconPhone,
   IconTrash,
-} from '@tabler/icons-react';
-import { COMPANY, products } from '../data/catalog';
-import { closeQuoteForm, quote, useQuote, useQuoteFormOpen } from '../hooks/useQuote';
-import { WhatsAppButton } from './WhatsAppButton';
-import classes from './QuoteModal.module.css';
+} from "@tabler/icons-react";
+import { COMPANY, products } from "../data/catalog";
+import {
+  closeQuoteForm,
+  quote,
+  useQuote,
+  useQuoteFormOpen,
+} from "../hooks/useQuote";
+import { WhatsAppButton } from "./WhatsAppButton";
+import classes from "./QuoteModal.module.css";
 
 /**
  * Formulario de solicitud de presupuesto.
@@ -42,9 +46,9 @@ import classes from './QuoteModal.module.css';
  * redactado, en vez de fingir que se ha enviado.
  */
 
-const ENDPOINT = import.meta.env.VITE_FORM_ENDPOINT ?? '';
+const ENDPOINT = import.meta.env.VITE_FORM_ENDPOINT ?? "";
 
-type Status = 'idle' | 'sending' | 'sent' | 'error';
+type Status = "idle" | "sending" | "sent" | "error";
 
 interface Values {
   name: string;
@@ -54,16 +58,23 @@ interface Values {
   message: string;
 }
 
-const EMPTY: Values = { name: '', company: '', email: '', phone: '', message: '' };
+const EMPTY: Values = {
+  name: "",
+  company: "",
+  email: "",
+  phone: "",
+  message: "",
+};
 
 /** Validación mínima: lo justo para no enviar una solicitud sin forma de responder. */
 const validate = (v: Values) => {
   const e: Partial<Record<keyof Values, string>> = {};
-  if (v.name.trim().length < 2) e.name = 'Indíquenos su nombre';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email.trim())) e.email = 'Revise el correo electrónico';
+  if (v.name.trim().length < 2) e.name = "Indíquenos su nombre";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email.trim()))
+    e.email = "Revise el correo electrónico";
   // El teléfono es opcional, pero si se escribe algo debe poder marcarse.
-  if (v.phone.trim() !== '' && v.phone.replace(/[\s.+-]/g, '').length < 9) {
-    e.phone = 'Revise el teléfono';
+  if (v.phone.trim() !== "" && v.phone.replace(/[\s.+-]/g, "").length < 9) {
+    e.phone = "Revise el teléfono";
   }
   return e;
 };
@@ -72,22 +83,29 @@ export function QuoteModal() {
   const opened = useQuoteFormOpen();
   const ids = useQuote();
   const [values, setValues] = useState<Values>(EMPTY);
-  const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>(
+    {},
+  );
   const [consent, setConsent] = useState(false);
   const [consentError, setConsentError] = useState(false);
-  const [status, setStatus] = useState<Status>('idle');
+  const [status, setStatus] = useState<Status>("idle");
   // Campo trampa: los robots lo rellenan, las personas no lo ven.
-  const [trap, setTrap] = useState('');
+  const [trap, setTrap] = useState("");
 
   const selected = useMemo(
-    () => ids.map((id) => products.find((p) => p.id === id)).filter((p) => p !== undefined),
+    () =>
+      ids
+        .map((id) => products.find((p) => p.id === id))
+        .filter((p) => p !== undefined),
     [ids],
   );
 
-  const set = (k: keyof Values) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setValues((prev) => ({ ...prev, [k]: e.currentTarget.value }));
-    setErrors((prev) => ({ ...prev, [k]: undefined }));
-  };
+  const set =
+    (k: keyof Values) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setValues((prev) => ({ ...prev, [k]: e.currentTarget.value }));
+      setErrors((prev) => ({ ...prev, [k]: undefined }));
+    };
 
   /** Texto plano con la solicitud, que vale igual para el correo y para el endpoint. */
   const body = () => {
@@ -96,29 +114,29 @@ export function QuoteModal() {
       values.company.trim() && `Empresa: ${values.company}`,
       `Correo: ${values.email}`,
       values.phone.trim() && `Teléfono: ${values.phone}`,
-      '',
+      "",
       selected.length > 0
-        ? `Productos de interés:\n${selected.map((p) => `· ${p.name} (${p.id})`).join('\n')}`
-        : 'Sin productos seleccionados del catálogo.',
-      '',
+        ? `Productos de interés:\n${selected.map((p) => `· ${p.name} (${p.id})`).join("\n")}`
+        : "Sin productos seleccionados del catálogo.",
+      "",
       values.message.trim() && `Consulta:\n${values.message}`,
     ];
-    return lines.filter(Boolean).join('\n');
+    return lines.filter(Boolean).join("\n");
   };
 
   const mailtoHref = () =>
     `mailto:${COMPANY.email}?subject=${encodeURIComponent(
       selected.length === 1
         ? `Solicitud de presupuesto: ${selected[0].name}`
-        : `Solicitud de presupuesto (${selected.length || 'consulta'})`,
+        : `Solicitud de presupuesto (${selected.length || "consulta"})`,
     )}&body=${encodeURIComponent(body())}`;
 
   const close = () => {
     closeQuoteForm();
     // El resultado se limpia al cerrar, para que la próxima vez no se abra con
     // el aviso de «enviado» de la solicitud anterior.
-    if (status === 'sent' || status === 'error') {
-      setStatus('idle');
+    if (status === "sent" || status === "error") {
+      setStatus("idle");
       setValues(EMPTY);
       setConsent(false);
     }
@@ -126,7 +144,7 @@ export function QuoteModal() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (trap !== '') return; // Robot.
+    if (trap !== "") return; // Robot.
 
     const eNext = validate(values);
     setErrors(eNext);
@@ -139,11 +157,14 @@ export function QuoteModal() {
       return;
     }
 
-    setStatus('sending');
+    setStatus("sending");
     try {
       const res = await fetch(ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify({
           nombre: values.name,
           empresa: values.company,
@@ -156,10 +177,10 @@ export function QuoteModal() {
         }),
       });
       if (!res.ok) throw new Error(String(res.status));
-      setStatus('sent');
+      setStatus("sent");
       quote.clear();
     } catch {
-      setStatus('error');
+      setStatus("error");
     }
   };
 
@@ -175,7 +196,7 @@ export function QuoteModal() {
         </Title>
       }
     >
-      {status === 'sent' ? (
+      {status === "sent" ? (
         <Stack align="center" gap="sm" py="lg" ta="center">
           <ThemeIcon color="teal" size={56} radius="xl" variant="light">
             <IconCircleCheck size={32} />
@@ -184,8 +205,9 @@ export function QuoteModal() {
             Solicitud enviada
           </Title>
           <Text c="dimmed" maw={420}>
-            Gracias. Hemos recibido su consulta y le responderemos con un presupuesto lo
-            antes posible. Si necesita algo urgente, puede llamarnos al{' '}
+            Gracias. Hemos recibido su consulta y le responderemos con un
+            presupuesto lo antes posible. Si necesita algo urgente, puede
+            llamarnos al{" "}
             <Anchor href={`tel:+${COMPANY.phoneRaw}`}>{COMPANY.phone}</Anchor>.
           </Text>
           <Button mt="sm" onClick={close}>
@@ -199,7 +221,7 @@ export function QuoteModal() {
             <Box>
               <Group justify="space-between" align="center" mb={8}>
                 <Text size="sm" fw={700}>
-                  Productos de su solicitud{' '}
+                  Productos de su solicitud{" "}
                   <Text span c="dimmed" fw={400}>
                     ({selected.length})
                   </Text>
@@ -218,8 +240,9 @@ export function QuoteModal() {
               </Group>
               {selected.length === 0 ? (
                 <Text size="sm" c="dimmed">
-                  No ha añadido ningún producto. Puede enviarnos igualmente su consulta y la
-                  resolvemos, o añadir productos desde el catálogo con «Añadir a mi solicitud».
+                  No ha añadido ningún producto. Puede enviarnos igualmente su
+                  consulta y la resolvemos, o añadir productos desde el catálogo
+                  con «Añadir a mi solicitud».
                 </Text>
               ) : (
                 <Group gap={6}>
@@ -253,7 +276,7 @@ export function QuoteModal() {
                 placeholder="Su nombre"
                 required
                 value={values.name}
-                onChange={set('name')}
+                onChange={set("name")}
                 error={errors.name}
                 autoComplete="name"
               />
@@ -261,7 +284,7 @@ export function QuoteModal() {
                 label="Empresa"
                 placeholder="Nombre de su empresa"
                 value={values.company}
-                onChange={set('company')}
+                onChange={set("company")}
                 autoComplete="organization"
               />
             </Group>
@@ -274,7 +297,7 @@ export function QuoteModal() {
                 type="email"
                 inputMode="email"
                 value={values.email}
-                onChange={set('email')}
+                onChange={set("email")}
                 error={errors.email}
                 autoComplete="email"
               />
@@ -284,7 +307,7 @@ export function QuoteModal() {
                 type="tel"
                 inputMode="tel"
                 value={values.phone}
-                onChange={set('phone')}
+                onChange={set("phone")}
                 error={errors.phone}
                 autoComplete="tel"
               />
@@ -298,7 +321,7 @@ export function QuoteModal() {
               autosize
               maxRows={8}
               value={values.message}
-              onChange={set('message')}
+              onChange={set("message")}
             />
 
             {/* Trampa para robots: fuera de la vista y fuera del recorrido del tabulador. */}
@@ -321,17 +344,21 @@ export function QuoteModal() {
                 setConsent(e.currentTarget.checked);
                 setConsentError(false);
               }}
-              error={consentError ? 'Necesitamos su consentimiento para poder responderle' : undefined}
+              error={
+                consentError
+                  ? "Necesitamos su consentimiento para poder responderle"
+                  : undefined
+              }
               label={
                 <Text size="sm">
-                  Acepto que {COMPANY.name} trate mis datos para responder a esta solicitud de
-                  presupuesto. No se utilizarán para ninguna otra finalidad ni se cederán a
-                  terceros.
+                  Acepto que {COMPANY.name} trate mis datos para responder a
+                  esta solicitud de presupuesto. No se utilizarán para ninguna
+                  otra finalidad ni se cederán a terceros.
                 </Text>
               }
             />
 
-            {status === 'error' && (
+            {status === "error" && (
               <Alert
                 color="red"
                 variant="light"
@@ -339,16 +366,21 @@ export function QuoteModal() {
                 title="No hemos podido enviar la solicitud"
               >
                 <Text size="sm">
-                  Ha fallado el envío. Puede intentarlo de nuevo, escribirnos a{' '}
-                  <Anchor href={mailtoHref()}>{COMPANY.email}</Anchor> o llamarnos al{' '}
-                  <Anchor href={`tel:+${COMPANY.phoneRaw}`}>{COMPANY.phone}</Anchor>.
+                  Ha fallado el envío. Puede intentarlo de nuevo, escribirnos a{" "}
+                  <Anchor href={mailtoHref()}>{COMPANY.email}</Anchor> o
+                  llamarnos al{" "}
+                  <Anchor href={`tel:+${COMPANY.phoneRaw}`}>
+                    {COMPANY.phone}
+                  </Anchor>
+                  .
                 </Text>
               </Alert>
             )}
 
             {!ENDPOINT && (
               <Text size="xs" c="dimmed">
-                Al enviar se abrirá su programa de correo con la solicitud ya redactada.
+                Al enviar se abrirá su programa de correo con la solicitud ya
+                redactada.
               </Text>
             )}
 
@@ -367,8 +399,10 @@ export function QuoteModal() {
               <Button
                 type="submit"
                 size="md"
-                loading={status === 'sending'}
-                leftSection={ENDPOINT ? <IconSend size={18} /> : <IconMail size={18} />}
+                loading={status === "sending"}
+                leftSection={
+                  ENDPOINT ? <IconMail size={18} /> : <IconMail size={18} />
+                }
               >
                 Enviar solicitud
               </Button>

@@ -1,0 +1,67 @@
+/*
+ * Cabecera de familia. Misma receta que el hero de la portada —foto en blanco y
+ * negro bajo un degradado azul— pero más baja: aquí lo importante empieza justo
+ * debajo, en la rejilla de producto.
+ */
+.head {
+  position: relative;
+  isolation: isolate;
+}
+
+.head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--cat-photo);
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1) contrast(1.05) brightness(0.8);
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    100deg,
+    rgba(0, 58, 140, 0.95) 0%,
+    rgba(13, 109, 255, 0.84) 48%,
+    rgba(4, 20, 48, 0.66) 100%
+  );
+}
+
+.headInner {
+  padding-block: clamp(2.25rem, 6vw, 4rem);
+}
+
+.crumbs {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: var(--mantine-font-size-sm);
+}
+
+.crumbLink {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.crumbLink:hover {
+  text-decoration: underline;
+}
+
+.intro {
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 62ch;
+}
+
+.ghost {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ghost:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #fff;
+}

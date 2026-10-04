@@ -130,16 +130,31 @@
   padding-top: 1.25rem;
 }
 
+/* Tres columnas iguales: cada motivo parte su texto dentro de la suya en
+   lugar de empujar al siguiente a otra fila. */
 .stat {
+  flex: 1 1 0;
   min-width: 0;
 }
 
 .statValue {
   color: #fff;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.3rem, 2.4vw, 1.75rem);
   font-weight: 800;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Palabra y sello en la misma línea: antes «Certificado CE» se partía en dos.
+ * El `nowrap` va sólo aquí y no en todo el valor, o «Personalización total»
+ * dejaría de partirse y empujaría el tercer motivo a otra fila.
+ */
+.withMark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  white-space: nowrap;
 }
 
 .statLabel {
@@ -155,6 +170,11 @@
   .stats {
     flex-direction: column;
     gap: 0.9rem;
+  }
+
+  /* Apilados, cada uno mide lo que su texto: fuera el reparto en columnas. */
+  .stat {
+    flex: none;
   }
 
   .statLabel {

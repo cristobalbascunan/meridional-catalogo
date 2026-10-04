@@ -21,7 +21,7 @@
  * JavaScript.
  */
 
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
@@ -38,10 +38,10 @@ const esc = (s) =>
     .replace(/"/g, '&quot;');
 
 /**
- * Carga `catalog.ts` con el propio Vite: es TypeScript y usa `import.meta.env`,
- * así que Node no puede importarlo tal cual.
+ * Carga los datos con el propio Vite: son TypeScript y usan `import.meta.env`,
+ * así que Node no puede importarlos tal cual.
  */
-const loadCatalog = async () => {
+const loadModules = async () => {
   const server = await createServer({
     root,
     logLevel: 'error',
@@ -49,14 +49,45 @@ const loadCatalog = async () => {
     appType: 'custom',
   });
   try {
-    return await server.ssrLoadModule('/src/data/catalog.ts');
+    return {
+      catalog: await server.ssrLoadModule('/src/data/catalog.ts'),
+      seo: await server.ssrLoadModule('/src/data/seoContent.ts'),
+    };
   } finally {
     await server.close();
   }
 };
 
-const catalog = await loadCatalog();
+const { catalog, seo } = await loadModules();
 const { COMPANY, SITE_URL, categories, products } = catalog;
+const { guides } = seo;
+
+/**
+ * Meta descripción. Google corta sobre los 155 caracteres, así que se recorta
+ * por palabra entera en vez de dejar que la corte él a mitad.
+ */
+const meta = (text) => {
+  const t = String(text).replace(/\s+/g, ' ').trim();
+  if (t.length <= 155) return t;
+  const cut = t.slice(0, 155);
+  return `${cut.slice(0, cut.lastIndexOf(' ')).replace(/[,;:.]$/, '')}…`;
+};
+
+/**
+ * Título de ficha. Google corta sobre los 60 caracteres y hay nombres de
+ * producto largos («Envolvedora de brazo giratorio Masterwrap HD Plus XL»), así
+ * que se va soltando lastre —primero la razón social, luego la familia— en vez
+ * de dejar que el corte se coma el nombre, que es lo único que no puede faltar.
+ */
+const productTitle = (p, category) => {
+  const brand = 'Meridional Plastic';
+  const candidates = [
+    `${p.name} — ${category.name} | ${brand}`,
+    `${p.name} | ${brand}`,
+    p.name,
+  ];
+  return candidates.find((t) => t.length <= 60) ?? p.name;
+};
 
 const site = (process.env.SITE_URL || SITE_URL).replace(/\/$/, '');
 const base = (process.env.BASE_PATH || '/').replace(/\/*$/, '/');
@@ -64,6 +95,21 @@ const base = (process.env.BASE_PATH || '/').replace(/\/*$/, '/');
 const url = (path = '') => `${site}${base}${path}`.replace(/([^:])\/{2,}/g, '$1/');
 
 const template = await readFile(join(dist, 'index.html'), 'utf8');
+
+/*
+ * Las dos fuentes van alojadas en el propio sitio (paquetes @fontsource-variable).
+ * Vite les pone un hash en el nombre, así que aquí se localizan los ficheros
+ * latinos —los que cubren el castellano— y se precargan desde el <head>: el
+ * navegador empieza a bajarlos a la vez que el CSS en lugar de esperar a
+ * encontrarlos dentro de él. Sin esto el texto se pintaba con la tipografía de
+ * reserva y saltaba a la buena al llegar.
+ */
+const fontFiles = (await readdir(join(dist, 'assets'))).filter((f) =>
+  /^(dm-sans|plus-jakarta-sans)-latin-wght-normal-.*\.woff2$/.test(f),
+);
+const fontPreloads = fontFiles
+  .map((f) => `<link rel="preload" as="font" type="font/woff2" href="${base}assets/${f}" crossorigin />`)
+  .join('\n    ');
 
 /* ------------------------------------------------------------------ Plantilla */
 
@@ -101,6 +147,7 @@ const render = ({ title, description, canonical, image, imageAlt, jsonLd, body }
   const extra = [
     `<link rel="canonical" href="${esc(canonical)}" />`,
     `<meta property="og:url" content="${esc(canonical)}" />`,
+    fontPreloads,
     jsonLd
       ? `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}</script>`
       : '',
@@ -121,8 +168,9 @@ const render = ({ title, description, canonical, image, imageAlt, jsonLd, body }
  * quien navega sin JavaScript— se lea bien, en vez de parecer una página rota.
  */
 const FALLBACK_CSS = `
-  .mp-static{max-width:1100px;margin:0 auto;padding:24px 16px 64px;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.55;color:#1a1b1e}
+  .mp-static{max-width:1100px;margin:0 auto;padding:24px 16px 64px;font-family:'DM Sans Variable','DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.55;color:#1a1b1e}
   .mp-static a{color:#0d6dff}
+  .mp-static h1,.mp-static h2,.mp-static h3{font-family:'Plus Jakarta Sans Variable','DM Sans Variable',system-ui,sans-serif}
   .mp-static h1{font-size:clamp(2rem,5vw,3.25rem);font-weight:800;line-height:1.1;margin:.2em 0}
   .mp-static h2{font-size:clamp(1.5rem,3.2vw,2.125rem);font-weight:800;margin:1.6em 0 .4em;border-bottom:1px solid #e9ecef;padding-bottom:.3em}
   .mp-static h3{font-size:1rem;font-weight:700;margin:0;line-height:1.25}
@@ -163,12 +211,19 @@ const staticShell = (inner) =>
 /** Portada: el catálogo entero, con un enlace por producto. */
 const homeBody = () =>
   staticShell(`
-    <h1>${esc(COMPANY.claim)}</h1>
+    <h1>Envases y embalajes industriales en ${esc(COMPANY.province)}</h1>
     <p class="mp-lead">
-      Distribución de material de envase y embalaje para industria y comercio en
-      ${esc(COMPANY.province)}: precinto, film estirable, burbuja, foam, fleje, cartón,
-      palés y maquinaria de envolver.
+      Precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria, con
+      un solo proveedor. Ficha técnica en cada producto y presupuesto sin compromiso en
+      ${esc(COMPANY.town)}, ${esc(COMPANY.province)}.
     </p>
+    <h2>Familias</h2>
+    <ul>${categories
+      .map(
+        (c) =>
+          `<li><a href="${esc(base)}categoria/${esc(c.id)}/">${esc(c.name)}</a> — ${esc(c.tagline)}</li>`,
+      )
+      .join('')}</ul>
     ${categories
       .map(
         (c) => `
@@ -226,15 +281,71 @@ const productBody = (p) => {
   `);
 };
 
+/** Familia: entradilla, productos, tabla de «cómo elegir» y preguntas frecuentes. */
+const categoryBody = (c) => {
+  const g = guides[c.id];
+  const list = products.filter((p) => p.category === c.id);
+  return staticShell(`
+    <p class="mp-muted"><a href="${esc(base)}">Catálogo</a> › ${esc(c.name)}</p>
+    <h1>${esc(g.h1)}</h1>
+    <p class="mp-lead">${esc(g.intro)}</p>
+    <h2>${esc(c.name)}</h2>
+    <ul class="mp-grid">
+      ${list
+        .map(
+          (p) => `<li>
+            <a href="${esc(base)}producto/${esc(p.id)}/">
+              <div class="mp-photo">${
+                p.image
+                  ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" decoding="async" />`
+                  : esc(p.family)
+              }</div>
+              <div class="mp-body">
+                <div class="mp-eyebrow">${esc(p.family)}</div>
+                <h3>${esc(p.name)}</h3>
+                <div class="mp-summary">${esc(p.summary)}</div>
+              </div>
+            </a>
+          </li>`,
+        )
+        .join('')}
+    </ul>
+    ${
+      g.guide
+        ? `<h2>${esc(g.guide.heading)}</h2>
+           <ul>${g.guide.rows
+             .map(([need, pick]) => `<li><strong>${esc(need)}:</strong> ${esc(pick)}</li>`)
+             .join('')}</ul>`
+        : ''
+    }
+    <h2>Preguntas frecuentes</h2>
+    ${g.faq.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')}
+    <h2>Otras familias</h2>
+    <ul>${categories
+      .filter((x) => x.id !== c.id)
+      .map((x) => `<li><a href="${esc(base)}categoria/${esc(x.id)}/">${esc(x.name)}</a></li>`)
+      .join('')}</ul>
+    ${contactBlock()}
+  `);
+};
+
 /* ----------------------------------------------------------- Datos de empresa */
 
+/*
+ * `LocalBusiness` además de `Organization`: es un almacén con dirección y
+ * teléfono al que se va y se llama, y es lo que Google usa para el panel local.
+ * No se declaran horario, precios ni valoraciones porque el cliente no los ha
+ * facilitado: un dato inventado ahí se convierte en una llamada a puerta cerrada.
+ */
 const organization = {
-  '@type': 'Organization',
+  '@type': ['Organization', 'LocalBusiness'],
   '@id': `${url()}#organizacion`,
   name: COMPANY.name,
   url: url(),
   email: COMPANY.email,
   telephone: `+${COMPANY.phoneRaw}`,
+  image: url('img/hero-tapes.jpg'),
+  logo: url('img/logo.png'),
   address: {
     '@type': 'PostalAddress',
     streetAddress: COMPANY.address,
@@ -243,7 +354,21 @@ const organization = {
     addressRegion: COMPANY.province,
     addressCountry: 'ES',
   },
+  areaServed: { '@type': 'AdministrativeArea', name: COMPANY.province },
+  // El mismo enlace que el botón «Encuéntrenos en Google» (`COMPANY.googleMaps`).
+  hasMap: COMPANY.googleMaps,
 };
+
+/** Migas de pan, para que el buscador dibuje la ruta bajo el resultado. */
+const breadcrumbs = (items) => ({
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map(([name, item], i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name,
+    item,
+  })),
+});
 
 /* ------------------------------------------------------------------- Escritura */
 
@@ -257,8 +382,10 @@ const write = async (relDir, html) => {
 await write(
   '.',
   render({
-    title: `Envase y embalaje en ${COMPANY.province} — ${COMPANY.name}`,
-    description: `Precinto, film estirable, burbuja, foam, fleje, cartón, palés y maquinaria de envolver. Catálogo con ficha técnica y presupuesto sin compromiso en ${COMPANY.town}, ${COMPANY.province}.`,
+    title: `Envases y embalajes en ${COMPANY.province} | ${COMPANY.name}`,
+    description: meta(
+      `Precinto, film estirable, burbuja, fleje, cartón, palés y maquinaria de embalaje. Ficha técnica y presupuesto sin compromiso en ${COMPANY.province}.`,
+    ),
     canonical: url(),
     image: url('img/hero-tapes.jpg'),
     imageAlt: 'Bobinas de precinto de Meridional Plastic',
@@ -271,12 +398,76 @@ await write(
           name: `Catálogo de envase y embalaje — ${COMPANY.name}`,
           url: url(),
           isPartOf: { '@id': `${url()}#organizacion` },
+          // Las nueve familias, para que el buscador vea la estructura del
+          // catálogo y no una sola página con 40 productos sueltos.
+          mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: categories.map((c, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: c.name,
+              url: url(`categoria/${c.id}/`),
+            })),
+          },
         },
       ],
     },
     body: homeBody(),
   }),
 );
+
+// Una página por familia
+for (const c of categories) {
+  const g = guides[c.id];
+  const canonical = url(`categoria/${c.id}/`);
+  const list = products.filter((p) => p.category === c.id);
+  const first = list.find((p) => p.image);
+
+  await write(
+    `categoria/${c.id}`,
+    render({
+      title: g.title,
+      description: meta(g.metaDescription),
+      canonical,
+      image: first ? `${site}${first.image}` : url('img/hero-tapes.jpg'),
+      imageAlt: c.name,
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'CollectionPage',
+            name: g.h1,
+            description: g.intro,
+            url: canonical,
+            isPartOf: { '@id': `${url()}#organizacion` },
+            mainEntity: {
+              '@type': 'ItemList',
+              itemListElement: list.map((p, i) => ({
+                '@type': 'ListItem',
+                position: i + 1,
+                name: p.name,
+                url: url(`producto/${p.id}/`),
+              })),
+            },
+          },
+          breadcrumbs([
+            ['Catálogo', url()],
+            [c.name, canonical],
+          ]),
+          {
+            '@type': 'FAQPage',
+            mainEntity: g.faq.map((f) => ({
+              '@type': 'Question',
+              name: f.q,
+              acceptedAnswer: { '@type': 'Answer', text: f.a },
+            })),
+          },
+        ],
+      },
+      body: categoryBody(c),
+    }),
+  );
+}
 
 // Una página por ficha
 for (const p of products) {
@@ -288,27 +479,37 @@ for (const p of products) {
   await write(
     `producto/${p.id}`,
     render({
-      title: `${p.name} — ${category.name} | ${COMPANY.name}`,
-      description: `${p.summary} Presupuesto sin compromiso en ${COMPANY.town}, ${COMPANY.province}.`.slice(
-        0,
-        300,
-      ),
+      title: productTitle(p, category),
+      // Antes se cortaba a 300 caracteres y Google la truncaba a media frase.
+      description: meta(`${p.summary} Presupuesto sin compromiso en ${COMPANY.province}.`),
       canonical,
       image,
       imageAlt: p.name,
       jsonLd: {
         '@context': 'https://schema.org',
-        '@type': 'Product',
-        name: p.name,
-        description: p.summary,
-        sku: p.id,
-        category: category.name,
-        url: canonical,
-        ...(p.image ? { image } : {}),
-        brand: { '@type': 'Brand', name: COMPANY.name },
-        // Sin precios publicados: el catálogo es a presupuesto, así que no se
-        // declara `offers` en lugar de inventarse una disponibilidad.
-        manufacturer: organization,
+        '@graph': [
+          // No se declara `Product`: Google lo valida como fragmento de producto
+          // y exige `offers`, `review` o `aggregateRating`. El catálogo es a
+          // presupuesto, sin precios ni reseñas, así que la ficha se describe
+          // como página de artículo en lugar de inventarse esos datos.
+          {
+            '@type': 'ItemPage',
+            name: p.name,
+            description: p.summary,
+            url: canonical,
+            ...(p.image
+              ? { primaryImageOfPage: { '@type': 'ImageObject', url: image } }
+              : {}),
+            isPartOf: { '@id': `${url()}#organizacion` },
+            about: { '@type': 'Thing', name: p.name, description: p.summary },
+            publisher: organization,
+          },
+          breadcrumbs([
+            ['Catálogo', url()],
+            [category.name, url(`categoria/${category.id}/`)],
+            [p.name, canonical],
+          ]),
+        ],
       },
       body: productBody(p),
     }),
@@ -319,6 +520,9 @@ for (const p of products) {
 
 const urls = [
   { loc: url(), priority: '1.0' },
+  // Las familias van por delante de las fichas: son las páginas que se quiere
+  // posicionar y las que reparten enlaces hacia el resto del catálogo.
+  ...categories.map((c) => ({ loc: url(`categoria/${c.id}/`), priority: '0.9' })),
   ...products.map((p) => ({ loc: url(`producto/${p.id}/`), priority: '0.8' })),
 ];
 
@@ -346,5 +550,7 @@ await writeFile(
 );
 
 console.log(
-  `Pregeneradas ${products.length + 1} páginas, sitemap con ${urls.length} direcciones (${site}${base}).`,
+  `Pregeneradas ${products.length + categories.length + 1} páginas (portada, ${
+    categories.length
+  } familias, ${products.length} fichas), sitemap con ${urls.length} direcciones (${site}${base}).`,
 );

@@ -11,9 +11,10 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useHotkeys, useMediaQuery, useWindowScroll } from "@mantine/hooks";
-import { IconPhone, IconSearch, IconSend } from "@tabler/icons-react";
+import { IconMail, IconPhone, IconSearch } from "@tabler/icons-react";
 import { COMPANY, asset } from "../data/catalog";
 import { openQuoteForm, useQuote } from "../hooks/useQuote";
+import { homePath, navigate } from "../hooks/useRoute";
 import classes from "./Header.module.css";
 
 interface Props {
@@ -103,8 +104,31 @@ export function Header({ query, onQuery }: Props) {
     >
       <Container size="xl" className={classes.top}>
         <Group justify="space-between" wrap="nowrap" gap="sm">
+          {/*
+            Antes era `href="#inicio"`: un ancla que sólo existe en la portada,
+            así que desde una familia o con una ficha abierta el logotipo no
+            hacía nada. Ahora lleva a la portada de verdad; si ya se está en
+            ella, sube arriba con suavidad.
+          */}
           <a
-            href="#inicio"
+            href={homePath}
+            onClick={(e) => {
+              if (
+                e.metaKey ||
+                e.ctrlKey ||
+                e.shiftKey ||
+                e.altKey ||
+                e.button !== 0
+              )
+                return;
+              e.preventDefault();
+              if (window.location.pathname === homePath) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                return;
+              }
+              navigate(homePath);
+              window.scrollTo({ top: 0 });
+            }}
             className={classes.brand}
             aria-label="Meridional Plastic — inicio"
           >
@@ -120,7 +144,7 @@ export function Header({ query, onQuery }: Props) {
           {/* El campo ancho aparece cuando el de la portada deja de verse. */}
           <Box
             className={classes.search}
-            data-visible={(scrolledPastHero || query !== "") || undefined}
+            data-visible={scrolledPastHero || query !== "" || undefined}
             aria-hidden={!scrolledPastHero && query === ""}
           >
             {searchInput(deskRef)}
@@ -180,7 +204,7 @@ export function Header({ query, onQuery }: Props) {
             >
               <Button
                 onClick={() => openQuoteForm()}
-                leftSection={<IconSend size={18} />}
+                leftSection={<IconMail size={18} />}
                 className={classes.quoteFull}
               >
                 {items.length > 0 ? "Mi solicitud" : "Presupuesto"}
@@ -193,7 +217,7 @@ export function Header({ query, onQuery }: Props) {
                 className={classes.quoteIcon}
                 aria-label="Solicitar presupuesto"
               >
-                <IconSend size={18} />
+                <IconMail size={18} />
               </ActionIcon>
             </Indicator>
           </Group>

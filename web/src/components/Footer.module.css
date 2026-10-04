@@ -11,7 +11,7 @@
 }
 
 .ce {
-  border: 1px solid var(--mantine-color-gray-3);
+  color: var(--mantine-color-dark-7);
 }
 
 .link {

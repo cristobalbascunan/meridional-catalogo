@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MantineProvider } from '@mantine/core';
+import '@fontsource-variable/dm-sans';
+import '@fontsource-variable/plus-jakarta-sans';
 import '@mantine/core/styles.css';
 import './index.css';
 import App from './App';

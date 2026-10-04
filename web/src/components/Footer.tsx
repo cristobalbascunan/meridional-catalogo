@@ -5,22 +5,18 @@ import {
   Divider,
   Grid,
   Group,
-  Image,
   Stack,
   Text,
   ThemeIcon,
   Title,
 } from '@mantine/core';
-import { IconMail, IconMapPin, IconPhone } from '@tabler/icons-react';
+import { IconBrandGoogleMaps, IconMail, IconMapPin, IconPhone } from '@tabler/icons-react';
 import { COMPANY, asset, categories } from '../data/catalog';
-import type { CategoryId } from '../data/catalog';
+import { categoryPath, linkTo } from '../hooks/useRoute';
+import { CeMark } from './CeMark';
 import classes from './Footer.module.css';
 
-interface Props {
-  onActive: (v: CategoryId | 'all') => void;
-}
-
-export function Footer({ onActive }: Props) {
+export function Footer() {
   return (
     <Box component="footer" className={classes.footer}>
       <Container size="xl" py="xl">
@@ -36,16 +32,14 @@ export function Footer({ onActive }: Props) {
                 {COMPANY.claim}. Distribución de material de envase y embalaje para industria y
                 comercio.
               </Text>
-              <Image
-                src={asset('img/ce.jpg')}
-                alt="Marcado CE"
-                w={180}
-                radius="sm"
-                className={classes.ce}
-              />
-              <Text size="xs" c="dimmed">
-                Todos los productos disponen de características técnicas y certificados CE.
-              </Text>
+              {/* El sello oficial, igual que en la portada, en vez de la foto
+                  con las letras encima: se reconoce antes y no pesa nada. */}
+              <Group gap="sm" wrap="nowrap" className={classes.ce}>
+                <CeMark height={30} />
+                <Text size="xs" c="dimmed" maw={260}>
+                  Todos los productos disponen de marcado CE y ficha técnica.
+                </Text>
+              </Group>
             </Stack>
           </Grid.Col>
 
@@ -53,16 +47,17 @@ export function Footer({ onActive }: Props) {
             <Title order={4} fz="md" mb="sm">
               Catálogo
             </Title>
+            {/* Enlaces de verdad a cada familia: antes sólo cambiaban el filtro
+                de la portada, así que el pie no aportaba ni una dirección nueva
+                que un buscador pudiera seguir. */}
             <Stack gap={6}>
               {categories.map((c) => (
                 <Anchor
                   key={c.id}
                   size="sm"
                   c="dimmed"
-                  onClick={() => {
-                    onActive(c.id);
-                    document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
+                  href={categoryPath(c.id)}
+                  onClick={linkTo(categoryPath(c.id))}
                   className={classes.link}
                 >
                   {c.name}
@@ -100,6 +95,14 @@ export function Footer({ onActive }: Props) {
                 </ThemeIcon>
                 <Anchor href={`tel:+${COMPANY.phoneRaw}`} size="sm">
                   {COMPANY.phone}
+                </Anchor>
+              </Group>
+              <Group gap="sm" wrap="nowrap">
+                <ThemeIcon variant="light" color="brand" size="md" radius="xl">
+                  <IconBrandGoogleMaps size={16} />
+                </ThemeIcon>
+                <Anchor href={COMPANY.googleMaps} target="_blank" rel="noopener" size="sm">
+                  Encuéntrenos en Google
                 </Anchor>
               </Group>
             </Stack>

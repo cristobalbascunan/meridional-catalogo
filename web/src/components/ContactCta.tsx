@@ -1,9 +1,22 @@
-import { Box, Button, Container, Group, Stack, Text, Title } from '@mantine/core';
-import { IconMapPin, IconPhone, IconSend } from '@tabler/icons-react';
-import { COMPANY } from '../data/catalog';
-import { openQuoteForm } from '../hooks/useQuote';
-import { WhatsAppButton } from './WhatsAppButton';
-import classes from './ContactCta.module.css';
+import {
+  Box,
+  Button,
+  Container,
+  Group,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import {
+  IconBrandGoogleMaps,
+  IconMail,
+  IconMapPin,
+  IconPhone,
+} from "@tabler/icons-react";
+import { COMPANY } from "../data/catalog";
+import { openQuoteForm } from "../hooks/useQuote";
+import { WhatsAppButton } from "./WhatsAppButton";
+import classes from "./ContactCta.module.css";
 
 /**
  * Cierre del catálogo: después de recorrer los productos hay que tener el
@@ -19,8 +32,8 @@ export function ContactCta() {
               ¿No encuentra lo que busca?
             </Title>
             <Text className={classes.lead}>
-              Trabajamos también formatos y medidas a medida. Cuéntenos qué necesita
-              embalar y le preparamos un presupuesto sin compromiso.
+              Trabajamos también formatos y medidas a medida. Cuéntenos qué
+              necesita embalar y le preparamos un presupuesto sin compromiso.
             </Text>
             <Group gap="xs" mt={4} className={classes.address}>
               <IconMapPin size={16} />
@@ -40,7 +53,7 @@ export function ContactCta() {
               radius="xl"
               variant="white"
               color="dark"
-              leftSection={<IconSend size={18} />}
+              leftSection={<IconMail size={18} />}
               onClick={() => openQuoteForm()}
             >
               Solicitar presupuesto
@@ -56,7 +69,27 @@ export function ContactCta() {
             >
               {COMPANY.phone}
             </Button>
-            <WhatsAppButton size="md" radius="xl" variant="outline" className={classes.ghost} />
+            <WhatsAppButton
+              size="md"
+              radius="xl"
+              variant="outline"
+              className={classes.ghost}
+            />
+            {/* La ficha de Google trae indicaciones para llegar, horario y
+                reseñas: es lo que busca quien va a recoger al almacén. */}
+            <Button
+              size="md"
+              radius="xl"
+              variant="outline"
+              className={classes.ghost}
+              component="a"
+              href={COMPANY.googleMaps}
+              target="_blank"
+              rel="noopener"
+              leftSection={<IconBrandGoogleMaps size={18} />}
+            >
+              Encuéntrenos en Google
+            </Button>
           </Group>
         </Group>
       </Container>

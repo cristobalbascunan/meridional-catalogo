@@ -62,32 +62,6 @@ body {
       translate: 0 0;
     }
   }
-
-  /*
-   * Transición de vista al cambiar de categoría o de filtro. Sustituye el
-   * fundido cruzado por defecto por uno con un ligero desplazamiento.
-   */
-  ::view-transition-old(catalogo) {
-    animation: mp-fade-out 180ms ease both;
-  }
-
-  ::view-transition-new(catalogo) {
-    animation: mp-fade-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  @keyframes mp-fade-out {
-    to {
-      opacity: 0;
-      translate: 0 -8px;
-    }
-  }
-
-  @keyframes mp-fade-in {
-    from {
-      opacity: 0;
-      translate: 0 10px;
-    }
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

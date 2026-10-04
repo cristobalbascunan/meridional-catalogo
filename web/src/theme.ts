@@ -34,9 +34,12 @@ export const theme = createTheme({
   colors: { brand: logoBlue, accent: logoRed },
   defaultRadius: 'md',
   fontFamily:
-    "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    "'DM Sans Variable', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
   headings: {
-    fontWeight: '800',
+    // Titulares con su propia tipografía: más carácter que el texto corrido.
+    fontFamily:
+      "'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', 'DM Sans Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    fontWeight: '700',
     sizes: {
       h1: { fontSize: 'clamp(2rem, 5vw, 3.25rem)', lineHeight: '1.1' },
       h2: { fontSize: 'clamp(1.5rem, 3.2vw, 2.125rem)', lineHeight: '1.15' },
